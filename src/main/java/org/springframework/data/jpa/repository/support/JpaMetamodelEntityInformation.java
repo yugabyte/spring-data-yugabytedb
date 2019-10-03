@@ -125,26 +125,23 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 
 		Class<?> superType = type.getJavaType().getSuperclass();
 
-		try {
-
-			ManagedType<?> managedSuperType = metamodel.managedType(superType);
-
-			if (!(managedSuperType instanceof IdentifiableType)) {
-				return Optional.empty();
-			}
-
-			return findVersionAttribute((IdentifiableType<T>) managedSuperType, metamodel);
-
-		} catch (IllegalArgumentException o_O) {
+		if (!JpaMetamodel.of(metamodel).isJpaManaged(superType)) {
 			return Optional.empty();
 		}
+
+		ManagedType<?> managedSuperType = metamodel.managedType(superType);
+
+		if (!(managedSuperType instanceof IdentifiableType)) {
+			return Optional.empty();
+		}
+
+		return findVersionAttribute((IdentifiableType<T>) managedSuperType, metamodel);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.core.EntityInformation#getId(java.lang.Object)
 	 */
-	@Override
 	@Nullable
 	@SuppressWarnings("unchecked")
 	public ID getId(T entity) {
@@ -175,7 +172,6 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.core.EntityInformation#getIdType()
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public Class<ID> getIdType() {
 		return (Class<ID>) idMetadata.getType();
@@ -185,7 +181,6 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 	 * (non-Javadoc)
 	 * @see org.springframework.data.jpa.repository.support.JpaEntityInformation#getIdAttribute()
 	 */
-	@Override
 	public SingularAttribute<? super T, ?> getIdAttribute() {
 		return idMetadata.getSimpleIdAttribute();
 	}
@@ -194,7 +189,6 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 	 * (non-Javadoc)
 	 * @see org.springframework.data.jpa.repository.support.JpaEntityInformation#hasCompositeId()
 	 */
-	@Override
 	public boolean hasCompositeId() {
 		return !idMetadata.hasSimpleId();
 	}
@@ -203,7 +197,6 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 	 * (non-Javadoc)
 	 * @see org.springframework.data.jpa.repository.support.JpaEntityInformation#getIdAttributeNames()
 	 */
-	@Override
 	public Iterable<String> getIdAttributeNames() {
 
 		List<String> attributeNames = new ArrayList<>(idMetadata.attributes.size());
@@ -219,7 +212,6 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 	 * (non-Javadoc)
 	 * @see org.springframework.data.jpa.repository.support.JpaEntityInformation#getCompositeIdAttributeValue(java.lang.Object, java.lang.String)
 	 */
-	@Override
 	public Object getCompositeIdAttributeValue(Object id, String idAttribute) {
 
 		Assert.isTrue(hasCompositeId(), "Model must have a composite Id!");
@@ -312,7 +304,6 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 		 * (non-Javadoc)
 		 * @see java.lang.Iterable#iterator()
 		 */
-		@Override
 		public Iterator<SingularAttribute<? super T, ?>> iterator() {
 			return attributes.iterator();
 		}
@@ -419,13 +410,17 @@ public class JpaMetamodelEntityInformation<T, ID> extends JpaEntityInformationSu
 				return false;
 			}
 
-			try {
-				ManagedType<?> managedType = this.metamodel.managedType(ProxyUtils.getUserClass(value));
-				return managedType != null && managedType.getPersistenceType() == PersistenceType.ENTITY;
-			} catch (IllegalArgumentException iae) {
-				// no mapped type
+			Class<?> userClass = ProxyUtils.getUserClass(value);
+
+			if (!this.jpaMetamodel.isJpaManaged(userClass)) {
 				return false;
 			}
+
+			ManagedType<?> managedType = this.metamodel.managedType(userClass);
+
+			Assert.state(managedType != null, "ManagedType must not be null. We checked that it exists before.");
+
+			return managedType.getPersistenceType() == PersistenceType.ENTITY;
 		}
 	}
 }

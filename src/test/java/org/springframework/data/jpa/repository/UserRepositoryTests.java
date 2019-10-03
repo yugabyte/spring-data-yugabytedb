@@ -2121,8 +2121,8 @@ public class UserRepositoryTests {
 
 		flushTestUsers();
 
-		Page<User> firstPage = repository.findByNativeNamedQueryWithPageable(PageRequest.of(0, 3));
-		Page<User> secondPage = repository.findByNativeNamedQueryWithPageable(PageRequest.of(1, 3));
+		Page<User> firstPage = repository.findByNativeNamedQueryWithPageable(new PageRequest(0, 3));
+		Page<User> secondPage = repository.findByNativeNamedQueryWithPageable(new PageRequest(1, 3));
 
 		SoftAssertions softly = new SoftAssertions();
 
@@ -2147,8 +2147,8 @@ public class UserRepositoryTests {
 
 		flushTestUsers();
 
-		Page<String> firstPage = repository.findByNativeQueryWithPageable(PageRequest.of(0, 3));
-		Page<String> secondPage = repository.findByNativeQueryWithPageable(PageRequest.of(1, 3));
+		Page<String> firstPage = repository.findByNativeQueryWithPageable(new PageRequest(0, 3));
+		Page<String> secondPage = repository.findByNativeQueryWithPageable(new PageRequest(1, 3));
 
 		SoftAssertions softly = new SoftAssertions();
 

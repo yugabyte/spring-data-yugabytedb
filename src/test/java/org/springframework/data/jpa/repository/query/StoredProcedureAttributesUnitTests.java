@@ -15,8 +15,7 @@
  */
 package org.springframework.data.jpa.repository.query;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.data.jpa.repository.query.StoredProcedureAttributes.*;
 
 import org.junit.Test;
@@ -25,13 +24,14 @@ import org.junit.Test;
  * Unit tests for {@link StoredProcedureAttributes}.
  *
  * @author Oliver Gierke
+ * @author Jens Schauder
  */
 public class StoredProcedureAttributesUnitTests {
 
 	@Test // DATAJPA-681
 	public void usesSyntheticOutputParameterNameForAdhocProcedureWithoutOutputName() {
 
-		StoredProcedureAttributes attributes = new StoredProcedureAttributes("procedure", null, Long.class);
-		assertThat(attributes.getOutputParameterNames().get(0), is(SYNTHETIC_OUTPUT_PARAMETER_NAME));
+		StoredProcedureAttributes attributes = new StoredProcedureAttributes("procedure", null, Long.class, false);
+		assertThat(attributes.getOutputParameterName()).isEqualTo(SYNTHETIC_OUTPUT_PARAMETER_NAME);
 	}
 }

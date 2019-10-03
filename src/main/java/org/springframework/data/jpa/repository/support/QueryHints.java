@@ -46,7 +46,7 @@ interface QueryHints extends Iterable<Entry<String, Object>> {
 	 * queries.
 	 *
 	 * @return new instance of {@link QueryHints}.
-	 * @since 2.2
+	 * @since 2.1.6
 	 */
 	QueryHints forCounts();
 

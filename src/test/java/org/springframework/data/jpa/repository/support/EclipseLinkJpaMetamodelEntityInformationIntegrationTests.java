@@ -15,7 +15,7 @@
  */
 package org.springframework.data.jpa.repository.support;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.io.Serializable;
 
@@ -41,7 +41,7 @@ public class EclipseLinkJpaMetamodelEntityInformationIntegrationTests
 	public void reactivatedDetectsIdTypeForMappedSuperclass() {
 		JpaEntityInformation<?, ?> information = JpaEntityInformationSupport.getEntityInformation(AbstractPersistable.class,
 				em);
-		assertEquals(String.class, information.getIdType());
+		assertThat(information.getIdType()).isEqualTo(String.class);
 	}
 
 	/**
@@ -66,7 +66,6 @@ public class EclipseLinkJpaMetamodelEntityInformationIntegrationTests
 	 * Re-activate test for DATAJPA-820.
 	 */
 	@Test
-	@Override
 	public void detectsVersionPropertyOnMappedSuperClass() {
 		super.detectsVersionPropertyOnMappedSuperClass();
 	}
@@ -92,8 +91,6 @@ public class EclipseLinkJpaMetamodelEntityInformationIntegrationTests
 	public void proxiedIdClassElement() {
 		super.proxiedIdClassElement();
 	}
-
-
 
 	@Override
 	protected String getMetadadataPersitenceUnitName() {

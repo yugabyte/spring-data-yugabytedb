@@ -15,7 +15,7 @@
  */
 package org.springframework.data.jpa.domain;
 
-import static org.springframework.data.jpa.domain.SpecificationComposition.*;
+import static org.springframework.data.jpa.domain.Specifications.CompositionType.*;
 
 import java.io.Serializable;
 
@@ -35,6 +35,7 @@ import org.springframework.lang.Nullable;
  * @author Sebastian Staudt
  * @author Mark Paluch
  */
+@SuppressWarnings("deprecation")
 public interface Specification<T> extends Serializable {
 
 	long serialVersionUID = 1L;
@@ -47,11 +48,8 @@ public interface Specification<T> extends Serializable {
 	 * @return
 	 * @since 2.0
 	 */
-	static <T> Specification<T> not(@Nullable Specification<T> spec) {
-
-		return spec == null //
-				? (root, query, builder) -> null//
-				: (root, query, builder) -> builder.not(spec.toPredicate(root, query, builder));
+	static <T> Specification<T> not(Specification<T> spec) {
+		return Specifications.negated(spec);
 	}
 
 	/**
@@ -62,9 +60,8 @@ public interface Specification<T> extends Serializable {
 	 * @return
 	 * @since 2.0
 	 */
-	@Nullable
-	static <T> Specification<T> where(@Nullable Specification<T> spec) {
-		return spec == null ? (root, query, builder) -> null : spec;
+	static <T> Specification<T> where(Specification<T> spec) {
+		return Specifications.where(spec);
 	}
 
 	/**
@@ -74,9 +71,8 @@ public interface Specification<T> extends Serializable {
 	 * @return The conjunction of the specifications
 	 * @since 2.0
 	 */
-	@Nullable
-	default Specification<T> and(@Nullable Specification<T> other) {
-		return composed(this, other, (builder, left, rhs) -> builder.and(left, rhs));
+	default Specification<T> and(Specification<T> other) {
+		return Specifications.composed(this, other, AND);
 	}
 
 	/**
@@ -86,9 +82,8 @@ public interface Specification<T> extends Serializable {
 	 * @return The disjunction of the specifications
 	 * @since 2.0
 	 */
-	@Nullable
-	default Specification<T> or(@Nullable Specification<T> other) {
-		return composed(this, other, (builder, left, rhs) -> builder.or(left, rhs));
+	default Specification<T> or(Specification<T> other) {
+		return Specifications.composed(this, other, OR);
 	}
 
 	/**

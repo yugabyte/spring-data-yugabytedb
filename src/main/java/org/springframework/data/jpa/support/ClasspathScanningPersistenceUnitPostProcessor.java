@@ -96,7 +96,6 @@ public class ClasspathScanningPersistenceUnitPostProcessor
 	 * (non-Javadoc)
 	 * @see org.springframework.context.ResourceLoaderAware#setResourceLoader(org.springframework.core.io.ResourceLoader)
 	 */
-	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 
 		Assert.notNull(resourceLoader, "ResourceLoader must not be null!");
@@ -121,7 +120,6 @@ public class ClasspathScanningPersistenceUnitPostProcessor
 	 * (non-Javadoc)
 	 * @see org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor#postProcessPersistenceUnitInfo(org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo)
 	 */
-	@Override
 	public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
 
 		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);

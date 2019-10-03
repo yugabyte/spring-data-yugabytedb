@@ -77,6 +77,8 @@ import org.springframework.util.StringUtils;
  * @author Nils Borrmann
  * @author Reda.Housni-Alaoui
  * @author Florian Lüdiger
+ * @author Grégoire Druant
+ * @author Mohammad Hewedy
  */
 public abstract class QueryUtils {
 
@@ -94,7 +96,8 @@ public abstract class QueryUtils {
 
 	private static final String COUNT_REPLACEMENT_TEMPLATE = "select count(%s) $5$6$7";
 	private static final String SIMPLE_COUNT_VALUE = "$2";
-	private static final String COMPLEX_COUNT_VALUE = "$3$6";
+	private static final String COMPLEX_COUNT_VALUE = "$3 $6";
+	private static final String COMPLEX_COUNT_LAST_VALUE = "$6";
 	private static final String ORDER_BY_PART = "(?iu)\\s+order\\s+by\\s+.*";
 
 	private static final Pattern ALIAS_MATCH;
@@ -110,7 +113,7 @@ public abstract class QueryUtils {
 	private static final Pattern ORDER_BY = Pattern.compile(".*order\\s+by\\s+.*", CASE_INSENSITIVE);
 
 	private static final Pattern NAMED_PARAMETER = Pattern
-			.compile(COLON_NO_DOUBLE_COLON + IDENTIFIER + "|\\#" + IDENTIFIER, CASE_INSENSITIVE);
+			.compile(COLON_NO_DOUBLE_COLON + IDENTIFIER + "|#" + IDENTIFIER, CASE_INSENSITIVE);
 
 	private static final Pattern CONSTRUCTOR_EXPRESSION;
 
@@ -118,9 +121,11 @@ public abstract class QueryUtils {
 
 	private static final int QUERY_JOIN_ALIAS_GROUP_INDEX = 3;
 	private static final int VARIABLE_NAME_GROUP_INDEX = 4;
+	private static final int COMPLEX_COUNT_FIRST_INDEX = 3;
 
-	private static final Pattern PUNCTATION_PATTERN = Pattern.compile(".*((?![\\._])[\\p{Punct}|\\s])");
+	private static final Pattern PUNCTATION_PATTERN = Pattern.compile(".*((?![._])[\\p{Punct}|\\s])");
 	private static final Pattern FUNCTION_PATTERN;
+	private static final Pattern FIELD_ALIAS_PATTERN;
 
 	private static final String UNSAFE_PROPERTY_REFERENCE = "Sort expression '%s' must only contain property references or "
 			+ "aliases used in the select clause. If you really want to use something other than that for sorting, please use "
@@ -134,12 +139,12 @@ public abstract class QueryUtils {
 		builder.append(IDENTIFIER_GROUP); // Entity name, can be qualified (any
 		builder.append("(?:\\sas)*"); // exclude possible "as" keyword
 		builder.append("(?:\\s)+"); // at least one space separating
-		builder.append("(?!(?:where|group by|order by))(\\w+)"); // the actual alias
+		builder.append("(?!(?:where|group\\s*by|order\\s*by))(\\w+)"); // the actual alias
 
 		ALIAS_MATCH = compile(builder.toString(), CASE_INSENSITIVE);
 
 		builder = new StringBuilder();
-		builder.append("(select\\s+((distinct )?(.+?)?)\\s+)?(from\\s+");
+		builder.append("(select\\s+((distinct)?((?s).+?)?)\\s+)?(from\\s+");
 		builder.append(IDENTIFIER);
 		builder.append("(?:\\s+as)?\\s+)");
 		builder.append(IDENTIFIER_GROUP);
@@ -147,7 +152,7 @@ public abstract class QueryUtils {
 
 		COUNT_MATCH = compile(builder.toString(), CASE_INSENSITIVE);
 
-		Map<PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<PersistentAttributeType, Class<? extends Annotation>>();
+		Map<PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<>();
 		persistentAttributeTypes.put(ONE_TO_ONE, OneToOne.class);
 		persistentAttributeTypes.put(ONE_TO_MANY, null);
 		persistentAttributeTypes.put(MANY_TO_ONE, ManyToOne.class);
@@ -177,6 +182,14 @@ public abstract class QueryUtils {
 		builder.append("\\s+[as|AS]+\\s+(([\\w\\.]+))");
 
 		FUNCTION_PATTERN = compile(builder.toString());
+
+		builder = new StringBuilder();
+		builder.append("\\s+"); // at least one space
+		builder.append("[^\\s\\(\\)]+"); // No white char no bracket
+		builder.append("\\s+[as|AS]+\\s+(([\\w\\.]+))"); // the potential alias
+
+		FIELD_ALIAS_PATTERN = compile(builder.toString());
+
 	}
 
 	/**
@@ -252,11 +265,12 @@ public abstract class QueryUtils {
 			builder.append(", ");
 		}
 
-		Set<String> aliases = getOuterJoinAliases(query);
-		Set<String> functionAliases = getFunctionAliases(query);
+		Set<String> joinAliases = getOuterJoinAliases(query);
+		Set<String> selectionAliases = getFunctionAliases(query);
+		selectionAliases.addAll(getFieldAliases(query));
 
 		for (Order order : sort) {
-			builder.append(getOrderClause(aliases, functionAliases, alias, order)).append(", ");
+			builder.append(getOrderClause(joinAliases, selectionAliases, alias, order)).append(", ");
 		}
 
 		builder.delete(builder.length() - 2, builder.length());
@@ -273,14 +287,14 @@ public abstract class QueryUtils {
 	 * @param order the order object to build the clause for. Must not be {@literal null}.
 	 * @return a String containing a order clause. Guaranteed to be not {@literal null}.
 	 */
-	private static String getOrderClause(Set<String> joinAliases, Set<String> functionAlias, @Nullable String alias,
+	private static String getOrderClause(Set<String> joinAliases, Set<String> selectionAlias, @Nullable String alias,
 			Order order) {
 
 		String property = order.getProperty();
 
 		checkSortExpression(order);
 
-		if (functionAlias.contains(property)) {
+		if (selectionAlias.contains(property)) {
 			return String.format("%s %s", property, toJpaDirection(order));
 		}
 
@@ -308,7 +322,7 @@ public abstract class QueryUtils {
 	 */
 	static Set<String> getOuterJoinAliases(String query) {
 
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		Matcher matcher = JOIN_PATTERN.matcher(query);
 
 		while (matcher.find()) {
@@ -319,6 +333,26 @@ public abstract class QueryUtils {
 			}
 		}
 
+		return result;
+	}
+
+	/**
+	 * Returns the aliases used for fields in the query.
+	 *
+	 * @param query a {@literal String} containing a query. Must not be {@literal null}.
+	 * @return a {@literal Set} containing all found aliases. Guaranteed to be not {@literal null}.
+	 */
+	private static Set<String> getFieldAliases(String query) {
+		Set<String> result = new HashSet<>();
+		Matcher matcher = FIELD_ALIAS_PATTERN.matcher(query);
+
+		while (matcher.find()) {
+			String alias = matcher.group(1);
+
+			if (StringUtils.hasText(alias)) {
+				result.add(alias);
+			}
+		}
 		return result;
 	}
 
@@ -444,15 +478,21 @@ public abstract class QueryUtils {
 		Assert.hasText(originalQuery, "OriginalQuery must not be null or empty!");
 
 		Matcher matcher = COUNT_MATCH.matcher(originalQuery);
-		String countQuery = null;
+		String countQuery;
 
 		if (countProjection == null) {
 
 			String variable = matcher.matches() ? matcher.group(VARIABLE_NAME_GROUP_INDEX) : null;
-			boolean useVariable = variable != null && StringUtils.hasText(variable) && !variable.startsWith("new")
-					&& !variable.startsWith("count(") && !variable.contains(",");
+			boolean useVariable = StringUtils.hasText(variable) //
+					&& !variable.startsWith(" new") //
+					&& !variable.startsWith("count(") //
+					&& !variable.contains(","); //
 
-			String replacement = useVariable ? SIMPLE_COUNT_VALUE : COMPLEX_COUNT_VALUE;
+			String complexCountValue = matcher.matches() &&
+					StringUtils.hasText(matcher.group(COMPLEX_COUNT_FIRST_INDEX)) ?
+					COMPLEX_COUNT_VALUE : COMPLEX_COUNT_LAST_VALUE;
+
+			String replacement = useVariable ? SIMPLE_COUNT_VALUE : complexCountValue;
 			countQuery = matcher.replaceFirst(String.format(COUNT_REPLACEMENT_TEMPLATE, replacement));
 		} else {
 			countQuery = matcher.replaceFirst(String.format(COUNT_REPLACEMENT_TEMPLATE, countProjection));
@@ -525,7 +565,7 @@ public abstract class QueryUtils {
 	 * Returns whether the given JPQL query contains a constructor expression.
 	 *
 	 * @param query must not be {@literal null} or empty.
-	 * @return
+	 * @return whether the given JPQL query contains a constructor expression.
 	 * @since 1.10
 	 */
 	public static boolean hasConstructorExpression(String query) {
@@ -539,7 +579,7 @@ public abstract class QueryUtils {
 	 * Returns the projection part of the query, i.e. everything between {@code select} and {@code from}.
 	 *
 	 * @param query must not be {@literal null} or empty.
-	 * @return
+	 * @return the projection part of the query.
 	 * @since 1.10.2
 	 */
 	public static String getProjection(String query) {
@@ -557,7 +597,7 @@ public abstract class QueryUtils {
 	 * @param order the order to transform into a JPA {@link javax.persistence.criteria.Order}
 	 * @param from the {@link From} the {@link Order} expression is based on
 	 * @param cb the {@link CriteriaBuilder} to build the {@link javax.persistence.criteria.Order} with
-	 * @return
+	 * @return Guaranteed to be not {@literal null}.
 	 */
 	@SuppressWarnings("unchecked")
 	private static javax.persistence.criteria.Order toJpaOrder(Order order, From<?, ?> from, CriteriaBuilder cb) {
@@ -573,7 +613,6 @@ public abstract class QueryUtils {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	static <T> Expression<T> toExpressionRecursively(From<?, ?> from, PropertyPath property) {
 		return toExpressionRecursively(from, property, false);
 	}

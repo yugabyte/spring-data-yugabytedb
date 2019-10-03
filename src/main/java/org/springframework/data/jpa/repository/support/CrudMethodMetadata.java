@@ -56,7 +56,7 @@ public interface CrudMethodMetadata {
 	 * just delegates to {@link #getQueryHints()}.
 	 *
 	 * @return
-	 * @since 2.2
+	 * @since 2.1.6
 	 */
 	default Map<String, Object> getQueryHintsForCount() {
 		return getQueryHints();

@@ -138,12 +138,7 @@ Saving an entity can be performed with the `CrudRepository.save(…)` method. It
 ==== Entity State-detection Strategies
 Spring Data JPA offers the following strategies to detect whether an entity is new or not:
 
-* Version-Property and Id-Property inspection (*default*):
-  By default Spring Data JPA inspects first if there is a Version-property of non-primitive type.
-  If there is the entity is considered new if the value is `null`.
-  Without such a Version-property Spring Data JPA inspects the identifier property of the given entity.
-  If the identifier property is `null`, then the entity is assumed to be new.
-  Otherwise, it is assumed to be not new.
+* Id-Property inspection (*default*): By default Spring Data JPA inspects the identifier property of the given entity. If the identifier property is `null`, then the entity is assumed to be new. Otherwise, it is assumed to be not new.
 * Implementing `Persistable`: If an entity implements `Persistable`, Spring Data JPA delegates the new detection to the `isNew(…)` method of the entity. See the link:$$https://docs.spring.io/spring-data/data-commons/docs/current/api/index.html?org/springframework/data/domain/Persistable.html$$[JavaDoc] for details.
 * Implementing `EntityInformation`: You can customize the `EntityInformation` abstraction used in the `SimpleJpaRepository` implementation by creating a subclass of `JpaRepositoryFactory` and overriding the `getEntityInformation(…)` method accordingly. You then have to register the custom implementation of `JpaRepositoryFactory` as a Spring bean. Note that this should be rarely necessary. See the link:$$https://docs.spring.io/spring-data/data-jpa/docs/current/api/index.html?org/springframework/data/jpa/repository/support/JpaRepositoryFactory.html$$[JavaDoc] for details.
 
@@ -190,7 +185,7 @@ The following table describes the keywords supported for JPA and what a method c
 |Keyword|Sample|JPQL snippet
 |`And`|`findByLastnameAndFirstname`|`… where x.lastname = ?1 and x.firstname = ?2`
 |`Or`|`findByLastnameOrFirstname`|`… where x.lastname = ?1 or x.firstname = ?2`
-|`Is`, `Equals`|`findByFirstname`,`findByFirstnameIs`,`findByFirstnameEquals`|`… where x.firstname = ?1`
+|`Is,Equals`|`findByFirstname`,`findByFirstnameIs`,`findByFirstnameEquals`|`… where x.firstname = ?1`
 |`Between`|`findByStartDateBetween`|`… where x.startDate between ?1 and ?2`
 |`LessThan`|`findByAgeLessThan`|`… where x.age < ?1`
 |`LessThanEqual`|`findByAgeLessThanEqual`|`… where x.age \<= ?1`
@@ -198,8 +193,8 @@ The following table describes the keywords supported for JPA and what a method c
 |`GreaterThanEqual`|`findByAgeGreaterThanEqual`|`… where x.age >= ?1`
 |`After`|`findByStartDateAfter`|`… where x.startDate > ?1`
 |`Before`|`findByStartDateBefore`|`… where x.startDate < ?1`
-|`IsNull`, `Null`|`findByAge(Is)Null`|`… where x.age is null`
-|`IsNotNull`, `NotNull`|`findByAge(Is)NotNull`|`… where x.age not null`
+|`IsNull`|`findByAgeIsNull`|`… where x.age is null`
+|`IsNotNull,NotNull`|`findByAge(Is)NotNull`|`… where x.age not null`
 |`Like`|`findByFirstnameLike`|`… where x.firstname like ?1`
 |`NotLike`|`findByFirstnameNotLike`|`… where x.firstname not like ?1`
 |`StartingWith`|`findByFirstnameStartingWith`|`… where x.firstname like ?1` (parameter bound with appended `%`)
@@ -643,10 +638,9 @@ include::{spring-data-commons-docs}/repository-projections.adoc[leveloffset=+2]
 
 [[jpa.stored-procedures]]
 == Stored Procedures
-The JPA 2.1 specification introduced support for calling stored procedures by using the JPA criteria query API.
-We Introduced the `@Procedure` annotation for declaring stored procedure metadata on a repository method.
+The JPA 2.1 specification introduced support for calling stored procedures by using the JPA criteria query API. We Introduced the `@Procedure` annotation for declaring stored procedure metadata on a repository method.
 
-The examples to follow use the following stored procedure:
+The examples to follow use the following procedure:
 
 .The definition of the `plus1inout` procedure in HSQL DB.
 ====
@@ -678,15 +672,7 @@ public class User {}
 ----
 ====
 
-Note that `@NamedStoredProcedureQuery` has two different names for the stored procedure.
-`name` is the name JPA uses. `procedureName` is the name the stored procedure has in the database.
-
-You can reference stored procedures from a repository method in multiple ways.
-The stored procedure to be called can either be defined directly by using the `value` or `procedureName` attribute of the `@Procedure` annotation.
-This referes directly to the stored procedure in the database and ignores any configuration via `@NamedStoredProcedureQuery`.
-
-Alternatively you may specify the `@NamedStoredProcedureQuery.name` attribute as the `@Procedure.name` attribute.
-If neither `value`, `procedureName` nor `name` is configured, the name of the repository method is used as the `name` attribute.
+You can reference stored procedures from a repository method in multiple ways. The stored procedure to be called can either be defined directly by using the `value` or `procedureName` attribute of the `@Procedure` annotation or indirectly by using the `name` attribute. If no name is configured, the name of the repository method is used as a fallback.
 
 The following example shows how to reference an explicitly mapped procedure:
 
@@ -700,29 +686,18 @@ Integer explicitlyNamedPlus1inout(Integer arg);
 ----
 ====
 
-The following example is equivalent to the previous one but uses the `procedureName` alias:
+The following example shows how to reference an implicitly mapped procedure by using a `procedureName` alias:
 
 .Referencing implicitly mapped procedure with name "plus1inout" in database via `procedureName` alias.
 ====
 [source, java]
 ----
 @Procedure(procedureName = "plus1inout")
-Integer callPlus1InOut(Integer arg);
+Integer plus1inout(Integer arg);
 ----
 ====
 
-The following is again equivalent to the previous two but using the method name instead of an explicite annotation attribute.
-
-.Referencing implicitly mapped named stored procedure "User.plus1" in `EntityManager` by using the method name.
-====
-[source, java]
-----
-@Procedure
-Integer plus1inout(@Param("arg") Integer arg);
-----
-====
-
-The following example shows how to reference a stored procedure by referencing the `@NamedStoredProcedureQuery.name` attribute.
+The following example shows how to reference an explicitly mapped named procedure in `EntityManager`:
 
 .Referencing explicitly mapped named stored procedure "User.plus1IO" in `EntityManager`.
 ====
@@ -733,9 +708,16 @@ Integer entityAnnotatedCustomNamedProcedurePlus1IO(@Param("arg") Integer arg);
 ----
 ====
 
-If the stored procedure getting called has a single out parameter that parameter may be returned as the return value of the method.
-If there are multiple out parameters specified in a `@NamedStoredProcedureQuery` annotation those can be returned as a `Map` with the key being the parameter name given in the `@NamedStoredProcedureQuery` annotation.
+The following example shows how to reference an implicitly named stored procedure in `EntityManager` by using the method name:
 
+.Referencing implicitly mapped named stored procedure "User.plus1" in `EntityManager` by using the method name.
+====
+[source, java]
+----
+@Procedure
+Integer plus1(@Param("arg") Integer arg);
+----
+====
 
 [[specifications]]
 == Specifications

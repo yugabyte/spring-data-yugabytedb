@@ -46,7 +46,6 @@ public class CustomGenericJpaRepository<T, ID extends Serializable> extends Simp
 	 * org.springframework.data.jpa.repository.custom.CustomGenericRepository
 	 * #customMethod(java.io.Serializable)
 	 */
-	@Override
 	public T customMethod(ID id) {
 
 		throw new UnsupportedOperationException("Forced exception for testing purposes.");

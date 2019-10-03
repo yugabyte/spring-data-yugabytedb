@@ -30,6 +30,5 @@ import com.querydsl.core.types.Predicate;
 public interface MailMessageRepository
 		extends JpaRepository<MailMessage, Long>, QuerydslPredicateExecutor<MailMessage> {
 
-	@Override
 	List<MailMessage> findAll(Predicate predicate, OrderSpecifier<?>... orders);
 }

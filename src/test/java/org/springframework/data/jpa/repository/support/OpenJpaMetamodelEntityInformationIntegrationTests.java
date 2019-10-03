@@ -46,7 +46,6 @@ public class OpenJpaMetamodelEntityInformationIntegrationTests extends JpaMetamo
 	 * Re-activate test for DATAJPA-820.
 	 */
 	@Test
-	@Override
 	public void detectsVersionPropertyOnMappedSuperClass() {
 		super.detectsVersionPropertyOnMappedSuperClass();
 	}

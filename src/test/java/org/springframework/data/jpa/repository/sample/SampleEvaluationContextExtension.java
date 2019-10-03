@@ -44,7 +44,6 @@ public class SampleEvaluationContextExtension implements EvaluationContextExtens
 
 		private static ThreadLocal<SampleAuthentication> auth = new ThreadLocal<SampleAuthentication>() {
 
-			@Override
 			protected SampleAuthentication initialValue() {
 				return new SampleAuthentication(new SampleUser(-1, "anonymous"));
 			}

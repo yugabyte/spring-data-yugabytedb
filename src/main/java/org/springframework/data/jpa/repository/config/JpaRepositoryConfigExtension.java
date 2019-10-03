@@ -145,7 +145,12 @@ public class JpaRepositoryConfigExtension extends RepositoryConfigurationExtensi
 	private static Optional<Character> getEscapeCharacter(RepositoryConfigurationSource source) {
 
 		try {
-			return source.getAttribute(ESCAPE_CHARACTER_PROPERTY, Character.class);
+
+			return AnnotationRepositoryConfigurationSource.class.isInstance(source) //
+					? Optional.ofNullable((Character) AnnotationRepositoryConfigurationSource.class.cast(source).getAttributes()
+							.get(ESCAPE_CHARACTER_PROPERTY)) //
+					: source.getAttribute(ESCAPE_CHARACTER_PROPERTY).map(it -> it.toCharArray()[0]);
+
 		} catch (IllegalArgumentException ___) {
 			return Optional.empty();
 		}
@@ -217,9 +222,7 @@ public class JpaRepositoryConfigExtension extends RepositoryConfigurationExtensi
 
 		registerIfNotAlreadyRegistered(() -> {
 
-			Object value = AnnotationRepositoryConfigurationSource.class.isInstance(config) //
-					? config.getRequiredAttribute(ESCAPE_CHARACTER_PROPERTY, Character.class) //
-					: config.getAttribute(ESCAPE_CHARACTER_PROPERTY).orElse("\\");
+			Object value = getEscapeCharacter(config).orElse('\\');
 
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(JpaEvaluationContextExtension.class);
 			builder.addConstructorArgValue(value);

@@ -5,7 +5,7 @@
 
 	<groupId>org.springframework.data</groupId>
 	<artifactId>spring-data-jpa</artifactId>
-	<version>2.2.0.BUILD-SNAPSHOT</version>
+	<version>2.1.10.RELEASE</version>
 
 	<name>Spring Data JPA</name>
 	<description>Spring Data module for JPA repositories.</description>
@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.data.build</groupId>
 		<artifactId>spring-data-parent</artifactId>
-		<version>2.2.0.BUILD-SNAPSHOT</version>
+		<version>2.1.10.RELEASE</version>
 	</parent>
 
 	<properties>
@@ -26,7 +26,7 @@
 		<mockito>2.19.1</mockito>
 		<hibernate.groupId>org.hibernate</hibernate.groupId>
 		<jpa>2.0.0</jpa>
-		<springdata.commons>2.2.0.BUILD-SNAPSHOT</springdata.commons>
+		<springdata.commons>2.1.10.RELEASE</springdata.commons>
 
 		<java-module-name>spring.data.jpa</java-module-name>
 
@@ -132,46 +132,6 @@
 			</repositories>
 		</profile>
 		<profile>
-			<id>snapshot</id>
-
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jfrog.buildinfo</groupId>
-						<artifactId>artifactory-maven-plugin</artifactId>
-						<version>2.6.1</version>
-						<inherited>false</inherited>
-						<executions>
-							<execution>
-								<id>build-info</id>
-								<goals>
-									<goal>publish</goal>
-								</goals>
-								<configuration>
-									<buildInfo>
-										<buildUrl>{{BUILD_URL}}</buildUrl>
-									</buildInfo>
-									<deployProperties>
-										<zip.name>spring-data-jpa</zip.name>
-										<zip.displayname>spring-data-jpa</zip.displayname>
-										<zip.deployed>false</zip.deployed>
-										<archives>*:*:*:*@zip</archives>
-									</deployProperties>
-									<publisher>
-										<contextUrl>https://repo.spring.io</contextUrl>
-										<username>{{USERNAME}}</username>
-										<password>{{PASSWORD}}</password>
-										<repoKey>libs-snapshot-local</repoKey>
-										<snapshotRepoKey>libs-snapshot-local</snapshotRepoKey>
-									</publisher>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>docs</id>
 
 			<build>
@@ -210,7 +170,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					
+
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>build-helper-maven-plugin</artifactId>
@@ -232,19 +192,6 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jfrog.buildinfo</groupId>
-						<artifactId>artifactory-maven-plugin</artifactId>
-						<version>2.6.1</version>
-						<inherited>false</inherited>
 					</plugin>
 				</plugins>
 			</build>
@@ -447,6 +394,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.springframework</groupId>
@@ -574,8 +522,8 @@
 
 	<repositories>
 		<repository>
-			<id>spring-libs-snapshot</id>
-			<url>https://repo.spring.io/libs-snapshot</url>
+			<id>spring-libs-release</id>
+			<url>https://repo.spring.io/libs-release</url>
 		</repository>
 	</repositories>
 

@@ -120,7 +120,6 @@ public class ClasspathScanningPersistenceUnitPostProcessorUnitTests {
 
 		ResourceLoader resolver = new PathMatchingResourcePatternResolver(new DefaultResourceLoader()) {
 
-			@Override
 			public Resource[] getResources(String locationPattern) throws IOException {
 
 				Resource[] resources = super.getResources(locationPattern);

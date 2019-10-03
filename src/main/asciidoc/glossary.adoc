@@ -12,9 +12,9 @@ DAO :: Data Access Object - Pattern to separate persisting logic from the object
 
 Dependency Injection :: Pattern to hand a component's dependency to the component from outside, freeing the component to lookup the dependent itself. For more information, see link:$$https://en.wikipedia.org/wiki/Dependency_Injection$$[https://en.wikipedia.org/wiki/Dependency_Injection].
 
-EclipseLink :: Object relational mapper implementing JPA - link:$$https://www.eclipse.org/eclipselink/$$[https://www.eclipse.org/eclipselink/]
+EclipseLink :: Object relational mapper implementing JPA - link:$$https://www.eclipselink.org$$[https://www.eclipselink.org]
 
-Hibernate :: Object relational mapper implementing JPA - link:$$https://hibernate.org/$$[https://hibernate.org/]
+Hibernate :: Object relational mapper implementing JPA - link:$$https://www.hibernate.org$$[https://www.hibernate.org]
 
 JPA :: Java Persistence API
 
