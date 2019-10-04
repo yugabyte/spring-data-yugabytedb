@@ -3,13 +3,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.springframework.data</groupId>
-	<artifactId>spring-data-jpa</artifactId>
-	<version>2.1.10.RELEASE</version>
+	<groupId>com.yugabyte</groupId>
+	<artifactId>spring-data-yugabytedb</artifactId>
+	<version>2.1.10-yb-1-SNAPSHOT</version>
 
-	<name>Spring Data JPA</name>
-	<description>Spring Data module for JPA repositories.</description>
-	<url>https://projects.spring.io/spring-data-jpa</url>
+	<name>Spring Data YugabyteDB</name>
+	<description>Spring Data module for YugabyteDB.</description>
+	<url>https://github.com/yugabyte/spring-data-yugabytedb</url>
 
 	<parent>
 		<groupId>org.springframework.data.build</groupId>
@@ -201,9 +201,9 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>${springdata.commons}</version>
+			<version>2.1.10.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -301,7 +301,6 @@
 			<groupId>${hibernate.groupId}</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>${hibernate}</version>
-			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -363,6 +362,12 @@
 			<artifactId>openwebbeans-se</artifactId>
 			<version>${webbeans}</version>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.yugabyte</groupId>
+			<artifactId>ysql</artifactId>
+			<version>42.2.7-yb-2-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
