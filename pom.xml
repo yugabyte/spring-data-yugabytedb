@@ -1,25 +1,93 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+      The following only applies to changes made to this file as part of YugaByte development.
+
+         Portions Copyright (c) YugaByte, Inc.
+
+      Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+      except in compliance with the License.  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software distributed under the
+      License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+      either express or implied.  See the License for the specific language governing permissions
+      and limitations under the License.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+		<relativePath />
+	</parent>
+
 	<groupId>com.yugabyte</groupId>
 	<artifactId>spring-data-yugabytedb</artifactId>
+	<packaging>jar</packaging>
 	<version>2.1.10-yb-1-SNAPSHOT</version>
 
 	<name>Spring Data YugabyteDB</name>
 	<description>Spring Data module for YugabyteDB.</description>
 	<url>https://github.com/yugabyte/spring-data-yugabytedb</url>
 
-	<parent>
-		<groupId>org.springframework.data.build</groupId>
-		<artifactId>spring-data-parent</artifactId>
-		<version>2.1.10.RELEASE</version>
-	</parent>
+	<scm>
+		<connection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</connection>
+		<developerConnection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</developerConnection>
+		<url>https://github.com/yugabyte/spring-data-yugabytedb.git</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>YugaByte Development Team</name>
+			<email>info@yugabyte.com</email>
+			<organization>YugaByte, Inc.</organization>
+			<organizationUrl>https://www.yugabyte.com</organizationUrl>
+		</developer>
+	</developers>
+
+	<distributionManagement>
+		<repository>
+			<id>${yugabyte.releases.repository.id}</id>
+			<url>${yugabyte.releases.repository.url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>${yugabyte.snapshots.repository.id}</id>
+			<url>${yugabyte.snapshots.repository.url}</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<properties>
+		<aspectj>1.9.3</aspectj>
+		<assertj>3.11.1</assertj>
+		<cdi>1.0</cdi>
+		<geronimo>1.0.1</geronimo>
+		<hamcrest>1.3</hamcrest>
+		<hsqldb>2.4.1</hsqldb>
+		<interceptor>1.2.1</interceptor>
+		<jacoco>0.8.2</jacoco>
+		<jacoco.destfile>${project.build.directory}/jacoco.exec</jacoco.destfile>
+		<javax-annotation-api>1.3</javax-annotation-api>
+		<jodatime>2.10.3</jodatime>
+		<junit>4.12</junit>
+		<lombok>1.18.6</lombok>
+		<querydsl>4.2.1</querydsl>
+		<spring>5.1.9.RELEASE</spring>
+		<spring.data.commons>2.1.10.RELEASE</spring.data.commons>
+		<source.level>1.8</source.level>
+		<threetenbp>1.3.8</threetenbp>
+		<webbeans>2.0.11</webbeans>
+		<ysql>42.2.7-yb-2</ysql>
 
-		<dist.key>DATAJPA</dist.key>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Require JDK 1.8 or later -->
+
+		<java.version>1.8</java.version>
 
 		<eclipselink>2.6.5</eclipselink>
 		<hibernate>5.2.17.Final</hibernate>
@@ -196,6 +264,35 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<profile>
+			<id>enforce-java8</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<version>1.4.1</version>
+						<executions>
+							<execution>
+								<id>enforce-java8</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireJavaVersion>
+											<version>1.8</version>
+										</requireJavaVersion>
+									</rules>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 	</profiles>
 
 	<dependencies>
@@ -203,43 +300,50 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>2.1.10.RELEASE</version>
+			<version>${spring.data.commons}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
+			<version>${spring}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
+			<version>${spring}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
+			<version>${spring}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
+			<version>${spring}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
+			<version>${spring}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-instrument</artifactId>
+			<version>${spring}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
+			<version>${spring}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -263,6 +367,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
+			<version>${spring}</version>
 			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
@@ -270,7 +375,7 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.4.1</version>
+			<version>${hsqldb}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -331,14 +436,14 @@
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-jcdi_2.0_spec</artifactId>
-			<version>1.0.1</version>
+			<version>${geronimo}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.interceptor</groupId>
 			<artifactId>javax.interceptor-api</artifactId>
-			<version>1.2.1</version>
+			<version>${interceptor}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -365,9 +470,51 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok}</version>
+			<scope>compile</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<version>${hamcrest}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>com.yugabyte</groupId>
 			<artifactId>ysql</artifactId>
-			<version>42.2.7-yb-2-SNAPSHOT</version>
+			<version>${ysql}</version>
 		</dependency>
 
 	</dependencies>
@@ -521,7 +668,48 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.7.1</version>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<optimize>true</optimize>
+					<showWarnings>true</showWarnings>
+					<useIncrementalCompilation>false</useIncrementalCompilation>
+
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+					<preparationGoals>clean verify -Penforce-java8</preparationGoals>
+					<arguments>-Psonatype-oss-release ${release.arguments}</arguments>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
