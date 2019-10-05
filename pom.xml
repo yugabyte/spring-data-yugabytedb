@@ -672,6 +672,36 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<breakiterator>true</breakiterator>
+					<header>Spring Data YugabyteDB</header>
+					<source>1.8</source>
+					<quiet>true</quiet>
+					<javadocDirectory>${shared.resources}/javadoc</javadocDirectory>
+					<overview>${shared.resources}/javadoc/overview.html</overview>
+					<docfilessubdirs>true</docfilessubdirs>
+					<doclint>none</doclint>
+					<links>
+						<link>https://docs.spring.io/spring/docs/5.0.x/javadoc-api/</link>
+						<link>https://docs.spring.io/spring-data/commons/docs/current/api/</link>
+						<link>https://docs.oracle.com/javase/8/docs/api/</link>
+					</links>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+
+			</plugin>
+
+			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
