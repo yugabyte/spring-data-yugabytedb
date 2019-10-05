@@ -28,7 +28,7 @@
 	<groupId>com.yugabyte</groupId>
 	<artifactId>spring-data-yugabytedb</artifactId>
 	<packaging>jar</packaging>
-	<version>2.1.10-yb-1</version>
+	<version>2.1.10-yb-2-SNAPSHOT</version>
 
 	<name>Spring Data YugabyteDB</name>
 	<description>Spring Data module for YugabyteDB.</description>
@@ -38,7 +38,7 @@
 		<connection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</connection>
 		<developerConnection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</developerConnection>
 		<url>https://github.com/yugabyte/spring-data-yugabytedb.git</url>
-		<tag>2.1.10-yb-1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<developers>
