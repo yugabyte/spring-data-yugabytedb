@@ -1,6 +1,6 @@
 = Spring Data YugabyteDB
 
-Spring Data YugabyteDB is the Spring data module for YugabyteDB database based on [Spring Data JPA](https://github.com/spring-projects/spring-data-jpa).
+Spring Data YugabyteDB is the Spring data module for YugabyteDB database based on https://github.com/spring-projects/spring-data-jpa[Spring Data JPA].
 
 
 == Getting Started
@@ -23,16 +23,17 @@ Add the Maven dependency:
 
 To enable the YugabyteDB configuration create configuration class:
 
-```
+[source,java]
+----
 @Configuration
 public class DatabaseConfiguration extends AbstractYugabyteConfiguration {
   // Here you can override the dataSource() method to configure the DataSource in code.
 }
-```
+----
 
 Configure your `application.properties`. For instance:
-
-```
+[source,properties]
+----
 spring.yugabyte.initialHost=localhost
 spring.yugabyte.port=5433
 spring.yugabyte.database=yugabyte
@@ -42,8 +43,8 @@ spring.yugabyte.maxPoolSizePerNode=8
 spring.yugabyte.connectionTimeoutMs=10000
 spring.yugabyte.generate-ddl=true
 spring.yugabyte.packages-to-scan=com.example.spring.jpa.springdatajpaexample.domain
-```
+----
 
-See also the [spring-data-yugabytedb-example](https://github.com/yugabyte/spring-data-yugabytedb-example) app.
+See also the https://github.com/yugabyte/spring-data-yugabytedb-example[spring-data-yugabytedb-example] app.
 
 
