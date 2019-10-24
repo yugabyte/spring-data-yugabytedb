@@ -1,7 +1,14 @@
 = Spring Data YugabyteDB
 
-Spring Data YugabyteDB is the Spring data module for YugabyteDB database based on https://github.com/spring-projects/spring-data-jpa[Spring Data JPA].
+This project brings the power of Distributed SQL to Spring developers by using an enhanced underlying https://github.com/yugabyte/jdbc-yugabytedb[JDBC driver] - which brings most features of PostgreSQL (as of v11.2) into a distributed database that is scalable and fault-tolerant. This project is based on https://github.com/spring-projects/spring-data-jpa[Spring Data JPA].
 
+== Unique Features
+
+In addition to providing most PostgreSQL features on top of a scalable and resilient distributed database, this project aims to enable the following:
+
+* Eliminate Load Balancer from SQL (cluster-awareness)
+* Develop Geo-Distributed Apps (topology-awareness)
+* Row Level Geo-partitioning support (partition-awareness)
 
 == Getting Started
 
