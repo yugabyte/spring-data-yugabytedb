@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
@@ -36,17 +35,20 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import com.yugabyte.data.jdbc.core.YsqlTemplate;
+import com.yugabyte.data.jdbc.core.convert.YsqlDataAccessStrategy;
+
 /**
  * Creates repository implementation based on YugabyteDB YSQL.
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbYsqlRepositoryFactory extends RepositoryFactorySupport {
+public class YsqlRepositoryFactory extends RepositoryFactorySupport {
 	
 	private final RelationalMappingContext context;
 	private final JdbcConverter converter;
 	private final ApplicationEventPublisher publisher;
-	private final DataAccessStrategy accessStrategy;
+	private final DataAccessStrategy dataAccessStrategy;
 	private final NamedParameterJdbcOperations operations;
 	private final Dialect dialect;
 	@Nullable private BeanFactory beanFactory;
@@ -54,7 +56,7 @@ public class YugabyteDbYsqlRepositoryFactory extends RepositoryFactorySupport {
 	private QueryMappingConfiguration queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
 	private EntityCallbacks entityCallbacks;
 	
-	public YugabyteDbYsqlRepositoryFactory(DataAccessStrategy dataAccessStrategy, RelationalMappingContext context,
+	public YsqlRepositoryFactory(YsqlDataAccessStrategy dataAccessStrategy, RelationalMappingContext context,
 			JdbcConverter converter, Dialect dialect, ApplicationEventPublisher publisher,
 			NamedParameterJdbcOperations operations) {
 
@@ -68,14 +70,10 @@ public class YugabyteDbYsqlRepositoryFactory extends RepositoryFactorySupport {
 		this.context = context;
 		this.converter = converter;
 		this.dialect = dialect;
-		this.accessStrategy = dataAccessStrategy;
+		this.dataAccessStrategy = dataAccessStrategy;
 		this.operations = operations;
 	}
 
-	/**
-	 * @param queryMappingConfiguration must not be {@literal null} consider {@link QueryMappingConfiguration#EMPTY}
-	 *          instead.
-	 */
 	public void setQueryMappingConfiguration(QueryMappingConfiguration queryMappingConfiguration) {
 
 		Assert.notNull(queryMappingConfiguration, "QueryMappingConfiguration must not be null!");
@@ -92,15 +90,11 @@ public class YugabyteDbYsqlRepositoryFactory extends RepositoryFactorySupport {
 		return (EntityInformation<T, ID>) new PersistentEntityInformation<>(entity);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.core.support.RepositoryFactorySupport#getTargetRepository(org.springframework.data.repository.core.RepositoryInformation)
-	 */
 	@SuppressWarnings("deprecation")
 	@Override
 	protected Object getTargetRepository(RepositoryInformation repositoryInformation) {
 
-		JdbcAggregateTemplate template = new JdbcAggregateTemplate(publisher, context, converter, accessStrategy);
+		YsqlTemplate template = new YsqlTemplate(publisher, context, converter, (YsqlDataAccessStrategy)dataAccessStrategy);
 
 		if (entityCallbacks != null) {
 			template.setEntityCallbacks(entityCallbacks);
@@ -112,30 +106,19 @@ public class YugabyteDbYsqlRepositoryFactory extends RepositoryFactorySupport {
 		return getTargetRepositoryViaReflection(repositoryInformation.getRepositoryBaseClass(), template, persistentEntity);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.core.support.RepositoryFactorySupport#getRepositoryBaseClass(org.springframework.data.repository.core.RepositoryMetadata)
-	 */
 	@Override
 	protected Class<?> getRepositoryBaseClass(RepositoryMetadata repositoryMetadata) {
 		return SimpleJdbcRepository.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.core.support.RepositoryFactorySupport#getQueryLookupStrategy(org.springframework.data.repository.query.QueryLookupStrategy.Key, org.springframework.data.repository.query.EvaluationContextProvider)
-	 */
 	@Override
 	protected Optional<QueryLookupStrategy> getQueryLookupStrategy(@Nullable QueryLookupStrategy.Key key,
 			QueryMethodEvaluationContextProvider evaluationContextProvider) {
 
-		return Optional.of(new YugabyteDbYsqlQueryLookupStrategy(publisher, entityCallbacks, context, converter, dialect,
+		return Optional.of(new YsqlQueryLookupStrategy(publisher, entityCallbacks, context, converter, dialect,
 				queryMappingConfiguration, operations, beanFactory));
 	}
 
-	/**
-	 * @param entityCallbacks
-	 */
 	public void setEntityCallbacks(EntityCallbacks entityCallbacks) {
 		this.entityCallbacks = entityCallbacks;
 	}

@@ -20,7 +20,7 @@ import org.springframework.data.jdbc.core.JdbcAggregateOperations;
  *
  * @author Nikhil Chandrappa
  */
-public interface YugabyteDbYsqlOperations extends JdbcAggregateOperations {
+public interface YsqlOperations extends JdbcAggregateOperations {
 	
 	/**
 	 * Counts the number of objects of a given type.
@@ -33,16 +33,16 @@ public interface YugabyteDbYsqlOperations extends JdbcAggregateOperations {
 	 */
 	long count(Class<?> domainType, QueryOptions queryOptions);
 	
-//	/**
-//	 * Insert objects into database using batch semantics.  This skips the test 
-//	 * if the objects being inserted is new and makes an insert.
-//	 * <p>
-//	 * This is useful if the client provides an id for Objects being stored.
-//	 * </p>
-//	 * 
-//	 * @param instancees of objects being inserted into the database.
-//	 * @param <T> Type of the objects being inserted.
-//	 */
+	/**
+	 * Insert objects into database using batch semantics.  This skips the test 
+	 * if the objects being inserted is new and makes an insert.
+	 * <p>
+	 * This is useful if the client provides an id for Objects being stored.
+	 * </p>
+	 * 
+	 * @param instancees of objects being inserted into the database.
+	 * @param <T> Type of the objects being inserted.
+	 */
 //	 <T> void insertAll(Iterable<T> instances);
 	 
 	 

@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbYsqlQueryLookupStrategy implements QueryLookupStrategy {
+public class YsqlQueryLookupStrategy implements QueryLookupStrategy {
 
 	private final ApplicationEventPublisher publisher;
 	private final @Nullable EntityCallbacks callbacks;
@@ -58,7 +58,7 @@ public class YugabyteDbYsqlQueryLookupStrategy implements QueryLookupStrategy {
 	private final NamedParameterJdbcOperations operations;
 	private final BeanFactory beanfactory;
 
-	YugabyteDbYsqlQueryLookupStrategy(ApplicationEventPublisher publisher, @Nullable EntityCallbacks callbacks,
+	YsqlQueryLookupStrategy(ApplicationEventPublisher publisher, @Nullable EntityCallbacks callbacks,
 			RelationalMappingContext context, JdbcConverter converter, Dialect dialect,
 			QueryMappingConfiguration queryMappingConfiguration, NamedParameterJdbcOperations operations,
 			BeanFactory beanfactory) {

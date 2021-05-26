@@ -10,18 +10,18 @@ import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.Table;
 
 /**
- * An SQL dialect for YugabyteDB.
+ * An SQL dialect for YugabyteDB YSQL.
  *
  * @author Nikhil Chandrappa
  * @since 2.3
  */
-public class YugabyteDbDialect extends PostgresDialect {
+public class YugabyteDialect extends PostgresDialect {
 	
-	public static final YugabyteDbDialect INSTANCE = new YugabyteDbDialect();
+	public static final YugabyteDialect INSTANCE = new YugabyteDialect();
 	
-	protected YugabyteDbDialect() {}
+	protected YugabyteDialect() {}
 	
-	private final YugabyteDbLockClause LOCK_CLAUSE = new YugabyteDbLockClause(this.getIdentifierProcessing());
+	private final YsqlLockClause LOCK_CLAUSE = new YsqlLockClause(this.getIdentifierProcessing());
 	
 	/*
 	 * (non-Javadoc)
@@ -32,11 +32,11 @@ public class YugabyteDbDialect extends PostgresDialect {
 		return LOCK_CLAUSE;
 	}
 	
-	static class YugabyteDbLockClause implements LockClause {
+	static class YsqlLockClause implements LockClause {
 
 		private final IdentifierProcessing identifierProcessing;
 
-		YugabyteDbLockClause(IdentifierProcessing identifierProcessing) {
+		YsqlLockClause(IdentifierProcessing identifierProcessing) {
 			this.identifierProcessing = identifierProcessing;
 		}
 

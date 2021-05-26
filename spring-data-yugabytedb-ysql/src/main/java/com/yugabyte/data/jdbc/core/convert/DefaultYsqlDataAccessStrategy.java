@@ -30,13 +30,13 @@ import com.yugabyte.data.jdbc.core.TransactionMode;
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbDefaultDataAccessStrategy extends DefaultDataAccessStrategy
-		implements YugabyteDbDataAccessStrategy {
+public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy
+		implements YsqlDataAccessStrategy {
 
 	private final NamedParameterJdbcOperations operations;
 	private final RelationalMappingContext context;
 
-	public YugabyteDbDefaultDataAccessStrategy(SqlGeneratorSource sqlGeneratorSource, RelationalMappingContext context,
+	public DefaultYsqlDataAccessStrategy(SqlGeneratorSource sqlGeneratorSource, RelationalMappingContext context,
 			JdbcConverter converter, NamedParameterJdbcOperations operations) {
 		super(sqlGeneratorSource, context, converter, operations);
 		this.operations = operations;

@@ -31,7 +31,8 @@ import org.springframework.data.repository.core.support.TransactionalRepositoryF
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
-import com.yugabyte.data.jdbc.core.convert.YugabyteDbDefaultDataAccessStrategy;
+import com.yugabyte.data.jdbc.core.convert.DefaultYsqlDataAccessStrategy;
+import com.yugabyte.data.jdbc.core.convert.YsqlDataAccessStrategy;
 
 /**
  * Special adapter for Springs
@@ -40,7 +41,7 @@ import com.yugabyte.data.jdbc.core.convert.YugabyteDbDefaultDataAccessStrategy;
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbYsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
+public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
 		extends TransactionalRepositoryFactoryBeanSupport<T, S, ID> implements ApplicationEventPublisherAware {
 	
 	private ApplicationEventPublisher publisher;
@@ -53,14 +54,14 @@ public class YugabyteDbYsqlRepositoryFactoryBean<T extends Repository<S, ID>, S,
 	private EntityCallbacks entityCallbacks;
 	private Dialect dialect;
 
-	protected YugabyteDbYsqlRepositoryFactoryBean(Class<? extends T> repositoryInterface) {
+	protected YsqlRepositoryFactoryBean(Class<? extends T> repositoryInterface) {
 		super(repositoryInterface);
 	}
 
 	@Override
 	protected RepositoryFactorySupport doCreateRepositoryFactory() {
 		
-		YugabyteDbYsqlRepositoryFactory yugabyteDbYsqlRepositoryFactory = new YugabyteDbYsqlRepositoryFactory(dataAccessStrategy, mappingContext,
+		YsqlRepositoryFactory yugabyteDbYsqlRepositoryFactory = new YsqlRepositoryFactory((YsqlDataAccessStrategy)dataAccessStrategy, mappingContext,
 				converter, dialect, publisher, operations);
 		yugabyteDbYsqlRepositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
 		yugabyteDbYsqlRepositoryFactory.setEntityCallbacks(entityCallbacks);
@@ -156,7 +157,7 @@ public class YugabyteDbYsqlRepositoryFactoryBean<T extends Repository<S, ID>, S,
 
 						SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(this.mappingContext, this.converter,
 								this.dialect);
-						return new YugabyteDbDefaultDataAccessStrategy(sqlGeneratorSource, this.mappingContext, this.converter,
+						return new DefaultYsqlDataAccessStrategy(sqlGeneratorSource, this.mappingContext, this.converter,
 								this.operations);
 					});
 		}

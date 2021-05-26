@@ -1,1 +1,2 @@
-org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=com.yugabyte.data.jdbc.repository.config.YugabyteDbDialectResolver.YugabyteDbDialectProvider
+org.springframework.data.repository.core.support.RepositoryFactorySupport=org.springframework.data.jdbc.repository.support.YsqlRepositoryFactory
+org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=com.yugabyte.data.jdbc.repository.config.YugabyteDialectResolver.YugabyteDialectProvider

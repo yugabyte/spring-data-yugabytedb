@@ -22,9 +22,9 @@ import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import com.yugabyte.data.jdbc.core.YugabyteDbYsqlJdbcTemplate;
-import com.yugabyte.data.jdbc.core.convert.YugabyteDbDataAccessStrategy;
-import com.yugabyte.data.jdbc.core.convert.YugabyteDbDefaultDataAccessStrategy;
+import com.yugabyte.data.jdbc.core.YsqlTemplate;
+import com.yugabyte.data.jdbc.core.convert.DefaultYsqlDataAccessStrategy;
+import com.yugabyte.data.jdbc.core.convert.YsqlDataAccessStrategy;
 
 /*
  * Beans registration for Spring Data YugabyteDB YSQL template and repository support.
@@ -33,18 +33,18 @@ import com.yugabyte.data.jdbc.core.convert.YugabyteDbDefaultDataAccessStrategy;
  * @since 2.3.0
  */
 @Configuration(proxyBeanMethods = false)
-public class AbstractYugabyteDbJdbcConfiguration {
+public class AbstractYugabyteJdbcConfiguration {
 	
 	@Bean
-	public YugabyteDbYsqlJdbcTemplate yugabyteDBYsqlJdbcTemplate(ApplicationContext applicationContext,
-			JdbcMappingContext mappingContext, JdbcConverter converter, YugabyteDbDataAccessStrategy dataAccessStrategy) {
-		return new YugabyteDbYsqlJdbcTemplate(applicationContext, mappingContext, converter, dataAccessStrategy);
+	public YsqlTemplate yugabyteDBYsqlJdbcTemplate(ApplicationContext applicationContext,
+			JdbcMappingContext mappingContext, JdbcConverter converter, YsqlDataAccessStrategy dataAccessStrategy) {
+		return new YsqlTemplate(applicationContext, mappingContext, converter, dataAccessStrategy);
 	}
 	
 	@Bean
 	public DataAccessStrategy dataAccessStrategyBean(NamedParameterJdbcOperations operations, JdbcConverter jdbcConverter,
 			JdbcMappingContext context, Dialect dialect) {
-		return new YugabyteDbDefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, dialect), context,
+		return new DefaultYsqlDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, dialect), context,
 				jdbcConverter, operations);
 	}
 

@@ -23,7 +23,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.repository.config.DefaultRepositoryBaseClass;
 
-import com.yugabyte.data.jdbc.repository.support.YugabyteDbYsqlRepositoryFactoryBean;
+import com.yugabyte.data.jdbc.repository.support.YsqlRepositoryFactoryBean;
 
 /**
  * Annotation to enable Spring Data YSQL repositories. 
@@ -35,8 +35,8 @@ import com.yugabyte.data.jdbc.repository.support.YugabyteDbYsqlRepositoryFactory
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(YugabyteDbYsqlRepositoriesRegistrar.class)
-public @interface EnableYugabyteDbYsqlRepositories {
+@Import(YsqlRepositoriesRegistrar.class)
+public @interface EnableYsqlRepositories {
 	
 	/**
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation declarations e.g.:
@@ -86,7 +86,7 @@ public @interface EnableYugabyteDbYsqlRepositories {
 	 * Returns the {@link FactoryBean} class to be used for each repository instance. Defaults to
 	 * {@link JdbcRepositoryFactoryBean}.
 	 */
-	Class<?> repositoryFactoryBeanClass() default YugabyteDbYsqlRepositoryFactoryBean.class;
+	Class<?> repositoryFactoryBeanClass() default YsqlRepositoryFactoryBean.class;
 
 	/**
 	 * Configure the repository base class to be used to create repository proxies for this particular configuration.

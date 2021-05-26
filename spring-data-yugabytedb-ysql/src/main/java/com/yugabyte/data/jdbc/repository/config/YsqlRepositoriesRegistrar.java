@@ -20,20 +20,20 @@ import org.springframework.data.repository.config.RepositoryConfigurationExtensi
 
 /**
  * {@link ImportBeanDefinitionRegistrar} to enable
- * {@link EnableYugabyteDbYsqlRepositories} annotation.
+ * {@link EnableYsqlRepositories} annotation.
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbYsqlRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
+public class YsqlRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
 
 	@Override
 	protected Class<? extends Annotation> getAnnotation() {
-		return EnableYugabyteDbYsqlRepositories.class;
+		return EnableYsqlRepositories.class;
 	}
 
 	@Override
 	protected RepositoryConfigurationExtension getExtension() {
-		return new YugabyteDbYsqlRepositoryConfigExtension();
+		return new YsqlRepositoryConfigExtension();
 	}
 
 }

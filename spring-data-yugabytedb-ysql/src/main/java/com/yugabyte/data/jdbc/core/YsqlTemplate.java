@@ -13,12 +13,13 @@
 package com.yugabyte.data.jdbc.core;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.util.Assert;
 
-import com.yugabyte.data.jdbc.core.convert.YugabyteDbDataAccessStrategy;
+import com.yugabyte.data.jdbc.core.convert.YsqlDataAccessStrategy;
 
 /**
  * {@link YugabyteDbYsqlOperations} implementation, storing entity objects in and obtaining them 
@@ -26,21 +27,27 @@ import com.yugabyte.data.jdbc.core.convert.YugabyteDbDataAccessStrategy;
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbYsqlJdbcTemplate extends JdbcAggregateTemplate implements YugabyteDbYsqlOperations {
+public class YsqlTemplate extends JdbcAggregateTemplate implements YsqlOperations {
 	
-	private YugabyteDbDataAccessStrategy accessStrategy;
+	private YsqlDataAccessStrategy ysqlDataAccessStrategy;
 
-	public YugabyteDbYsqlJdbcTemplate(ApplicationContext publisher, RelationalMappingContext context,
-			JdbcConverter converter, YugabyteDbDataAccessStrategy dataAccessStrategy) {
+	public YsqlTemplate(ApplicationContext publisher, RelationalMappingContext context,
+			JdbcConverter converter, YsqlDataAccessStrategy dataAccessStrategy) {
 		super(publisher, context, converter, dataAccessStrategy);
-		this.accessStrategy = dataAccessStrategy;
+		this.ysqlDataAccessStrategy = dataAccessStrategy;
 	}
 	
+	public YsqlTemplate(ApplicationEventPublisher publisher, RelationalMappingContext context, JdbcConverter converter,
+			YsqlDataAccessStrategy dataAccessStrategy) {
+		super(publisher, context, converter, dataAccessStrategy);
+		this.ysqlDataAccessStrategy = dataAccessStrategy;
+	}
+
 	public long count(Class<?> domainType, QueryOptions queryOptions) {
 
 		Assert.notNull(domainType, "Domain type must not be null");
 		
-		return accessStrategy.count(domainType, queryOptions);
+		return ysqlDataAccessStrategy.count(domainType, queryOptions);
 	}
 
 //	@Override

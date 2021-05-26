@@ -24,7 +24,7 @@ import org.springframework.data.repository.config.RepositoryConfigurationExtensi
 import org.springframework.data.repository.config.RepositoryConfigurationSource;
 import org.springframework.util.StringUtils;
 
-import com.yugabyte.data.jdbc.repository.support.YugabyteDbYsqlRepositoryFactoryBean;
+import com.yugabyte.data.jdbc.repository.support.YsqlRepositoryFactoryBean;
 
 /**
  * {@link org.springframework.data.repository.config.RepositoryConfigurationExtension} extending the repository
@@ -32,7 +32,7 @@ import com.yugabyte.data.jdbc.repository.support.YugabyteDbYsqlRepositoryFactory
  *
  * @author Nikhil Chandrappa
  */
-public class YugabyteDbYsqlRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
+public class YsqlRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
 	
 	private static final String DEFAULT_TRANSACTION_MANAGER_BEAN_NAME = "transactionManager";
 
@@ -45,7 +45,7 @@ public class YugabyteDbYsqlRepositoryConfigExtension extends RepositoryConfigura
 	@Override
 	public String getRepositoryFactoryBeanClassName() {
 
-		return YugabyteDbYsqlRepositoryFactoryBean.class.getName();
+		return YsqlRepositoryFactoryBean.class.getName();
 	}
 
 	@Override

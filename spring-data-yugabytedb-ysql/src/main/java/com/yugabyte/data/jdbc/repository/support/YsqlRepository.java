@@ -16,7 +16,7 @@ import org.springframework.data.jdbc.repository.support.SimpleJdbcRepository;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yugabyte.data.jdbc.core.YugabyteDbYsqlOperations;
+import com.yugabyte.data.jdbc.core.YsqlOperations;
 
 /**
  * The YugabyteDB repository implementation to support YSQL distributed SQL operations.
@@ -24,27 +24,20 @@ import com.yugabyte.data.jdbc.core.YugabyteDbYsqlOperations;
  * @author Nikhil Chandrappa
  */
 @Transactional(readOnly = true)
-public class YugabyteDbJdbcRepository<T, ID> extends SimpleJdbcRepository<T, ID> {
+public class YsqlRepository<T, ID> extends SimpleJdbcRepository<T, ID> {
 	
 	
-	private final YugabyteDbYsqlOperations entityOperations;
+	private final YsqlOperations entityOperations;
 	private final PersistentEntity<T, ?> entity;
 
-	public YugabyteDbJdbcRepository(YugabyteDbYsqlOperations entityOperations, PersistentEntity<T, ?> entity) {
+	public YsqlRepository(YsqlOperations entityOperations, PersistentEntity<T, ?> entity) {
 		super(entityOperations, entity);
 		this.entityOperations = entityOperations;
 		this.entity = entity;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.CrudRepository#count()
-	 */
 	@Override
 	public long count() {
 		return entityOperations.count(entity.getType());
 	}
-	
-	
-
 }

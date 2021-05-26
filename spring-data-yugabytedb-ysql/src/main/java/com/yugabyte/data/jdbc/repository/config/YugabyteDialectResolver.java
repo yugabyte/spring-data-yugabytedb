@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.lang.Nullable;
 
-import com.yugabyte.data.relational.core.dialect.YugabyteDbDialect;
+import com.yugabyte.data.relational.core.dialect.YugabyteDialect;
 
 /**
  * An SQL dialect for YugabyteDB.
@@ -34,20 +34,20 @@ import com.yugabyte.data.relational.core.dialect.YugabyteDbDialect;
  * @author Nikhil Chandrappa
  * @since 2.3
  */
-public class YugabyteDbDialectResolver {
+public class YugabyteDialectResolver {
 
-	static public class YugabyteDbDialectProvider extends DefaultDialectProvider {
+	static public class YugabyteDialectProvider extends DefaultDialectProvider {
 
-		private static final Log LOG = LogFactory.getLog(YugabyteDbDialectProvider.class);
+		private static final Log LOG = LogFactory.getLog(YugabyteDialectProvider.class);
 
 		@Override
 		public Optional<Dialect> getDialect(JdbcOperations operations) {
 
-			Optional<Dialect> yugabytedbdialect = Optional.ofNullable(
-					operations.execute((ConnectionCallback<Dialect>) YugabyteDbDialectProvider::getDialect));
+			Optional<Dialect> yugabyteDialect = Optional.ofNullable(
+					operations.execute((ConnectionCallback<Dialect>) YugabyteDialectProvider::getDialect));
 
-			if (yugabytedbdialect.isPresent()) {
-				return yugabytedbdialect;
+			if (yugabyteDialect.isPresent()) {
+				return yugabyteDialect;
 			}
 
 			return super.getDialect(operations);
@@ -62,7 +62,7 @@ public class YugabyteDbDialectResolver {
 			String name = metaData.getDatabaseProductName().toLowerCase(Locale.ENGLISH);
 
 			if (name.contains("yugabyte")) {
-				return YugabyteDbDialect.INSTANCE;
+				return YugabyteDialect.INSTANCE;
 			}
 
 			LOG.info(String.format("Couldn't determine Dialect for \"%s\"", name));
