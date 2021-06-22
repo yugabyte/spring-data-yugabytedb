@@ -18,7 +18,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
@@ -48,7 +47,7 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	private BeanFactory beanFactory;
 	private RelationalMappingContext mappingContext;
 	private JdbcConverter converter;
-	private DataAccessStrategy dataAccessStrategy;
+	private YsqlDataAccessStrategy ysqlDataAccessStrategy;
 	private QueryMappingConfiguration queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
 	private NamedParameterJdbcOperations operations;
 	private EntityCallbacks entityCallbacks;
@@ -61,7 +60,7 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	@Override
 	protected RepositoryFactorySupport doCreateRepositoryFactory() {
 		
-		YsqlRepositoryFactory yugabyteDbYsqlRepositoryFactory = new YsqlRepositoryFactory((YsqlDataAccessStrategy)dataAccessStrategy, mappingContext,
+		YsqlRepositoryFactory yugabyteDbYsqlRepositoryFactory = new YsqlRepositoryFactory(ysqlDataAccessStrategy, mappingContext,
 				converter, dialect, publisher, operations);
 		yugabyteDbYsqlRepositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
 		yugabyteDbYsqlRepositoryFactory.setEntityCallbacks(entityCallbacks);
@@ -95,11 +94,11 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 		this.dialect = dialect;
 	}
 	
-	public void setDataAccessStrategy(DataAccessStrategy dataAccessStrategy) {
+	public void setDataAccessStrategy(YsqlDataAccessStrategy dataAccessStrategy) {
 
 		Assert.notNull(dataAccessStrategy, "DataAccessStrategy must not be null");
 
-		this.dataAccessStrategy = dataAccessStrategy;
+		this.ysqlDataAccessStrategy = dataAccessStrategy;
 	}
 	
 	@Autowired(required = false)
@@ -146,11 +145,11 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 			this.operations = beanFactory.getBean(NamedParameterJdbcOperations.class);
 		}
 
-		if (this.dataAccessStrategy == null) {
+		if (this.ysqlDataAccessStrategy == null) {
 
 			Assert.state(beanFactory != null, "If no DataAccessStrategy is set a BeanFactory must be available.");
 
-			this.dataAccessStrategy = this.beanFactory.getBeanProvider(DataAccessStrategy.class) //
+			this.ysqlDataAccessStrategy = this.beanFactory.getBeanProvider(YsqlDataAccessStrategy.class) //
 					.getIfAvailable(() -> {
 
 						Assert.state(this.dialect != null, "Dialect is required and must not be null!");

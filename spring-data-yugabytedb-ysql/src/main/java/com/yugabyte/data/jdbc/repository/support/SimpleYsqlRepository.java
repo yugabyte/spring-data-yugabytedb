@@ -24,13 +24,13 @@ import com.yugabyte.data.jdbc.core.YsqlOperations;
  * @author Nikhil Chandrappa
  */
 @Transactional(readOnly = true)
-public class YsqlRepository<T, ID> extends SimpleJdbcRepository<T, ID> {
+public class SimpleYsqlRepository<T, ID> extends SimpleJdbcRepository<T, ID> {
 	
 	
 	private final YsqlOperations entityOperations;
 	private final PersistentEntity<T, ?> entity;
 
-	public YsqlRepository(YsqlOperations entityOperations, PersistentEntity<T, ?> entity) {
+	public SimpleYsqlRepository(YsqlOperations entityOperations, PersistentEntity<T, ?> entity) {
 		super(entityOperations, entity);
 		this.entityOperations = entityOperations;
 		this.entity = entity;

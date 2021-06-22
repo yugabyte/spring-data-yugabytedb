@@ -50,12 +50,4 @@ public class YsqlTemplate extends JdbcAggregateTemplate implements YsqlOperation
 		return ysqlDataAccessStrategy.count(domainType, queryOptions);
 	}
 
-//	@Override
-//	public <T> void insertAll(Iterable<T> instances) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-	
-	
-
 }

@@ -80,16 +80,6 @@ public class YsqlQueryLookupStrategy implements QueryLookupStrategy {
 		this.beanfactory = beanfactory;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.data.repository.query.QueryLookupStrategy#resolveQuery(
-	 * java.lang.reflect.Method,
-	 * org.springframework.data.repository.core.RepositoryMetadata,
-	 * org.springframework.data.projection.ProjectionFactory,
-	 * org.springframework.data.repository.core.NamedQueries)
-	 */
 	@Override
 	public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
 			ProjectionFactory projectionFactory, NamedQueries namedQueries) {

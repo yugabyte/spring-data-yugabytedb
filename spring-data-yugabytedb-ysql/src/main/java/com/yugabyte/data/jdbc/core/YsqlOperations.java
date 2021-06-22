@@ -33,17 +33,17 @@ public interface YsqlOperations extends JdbcAggregateOperations {
 	 */
 	long count(Class<?> domainType, QueryOptions queryOptions);
 	
-	/**
-	 * Insert objects into database using batch semantics.  This skips the test 
-	 * if the objects being inserted is new and makes an insert.
-	 * <p>
-	 * This is useful if the client provides an id for Objects being stored.
-	 * </p>
-	 * 
-	 * @param instancees of objects being inserted into the database.
-	 * @param <T> Type of the objects being inserted.
-	 */
-//	 <T> void insertAll(Iterable<T> instances);
+//	/**
+//	 * Insert objects into database using batch semantics.  This skips the test 
+//	 * if the objects being inserted is new and makes an insert.
+//	 * <p>
+//	 * This is useful if the client provides an id for Objects being stored.
+//	 * </p>
+//	 * 
+//	 * @param instancees of objects being inserted into the database.
+//	 * @param <T> Type of the objects being inserted.
+//	 */
+//	 <T> void insertAll(Iterable<T> instances, QueryOptions queryOptions);
 	 
 	 
 //	/**
@@ -56,8 +56,8 @@ public interface YsqlOperations extends JdbcAggregateOperations {
 //	 * @param specify action to be performed on conflict during upsert operation.
 //	 * @param <T> Type of the objects being updated or inserted.
 //	 */
-//	<T> T upsert(T instance, String... onConflictActions);
-//
+//	<T> T upsert(T instance, QueryOptions queryOptions);
+
 //	/**
 //	 * Load an aggregate from the database.
 //	 *

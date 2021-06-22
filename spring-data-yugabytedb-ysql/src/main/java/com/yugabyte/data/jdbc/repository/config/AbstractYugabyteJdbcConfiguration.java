@@ -12,14 +12,22 @@
 */
 package com.yugabyte.data.jdbc.repository.config;
 
+import java.util.Optional;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
+import org.springframework.data.jdbc.core.convert.DefaultJdbcTypeFactory;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
+import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
+import org.springframework.data.jdbc.repository.config.DialectResolver;
 import org.springframework.data.relational.core.dialect.Dialect;
+import org.springframework.data.relational.core.mapping.NamingStrategy;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.yugabyte.data.jdbc.core.YsqlTemplate;
@@ -36,16 +44,46 @@ import com.yugabyte.data.jdbc.core.convert.YsqlDataAccessStrategy;
 public class AbstractYugabyteJdbcConfiguration {
 	
 	@Bean
-	public YsqlTemplate yugabyteDBYsqlJdbcTemplate(ApplicationContext applicationContext,
+	public YsqlTemplate ysqlTemplate(ApplicationContext applicationContext,
 			JdbcMappingContext mappingContext, JdbcConverter converter, YsqlDataAccessStrategy dataAccessStrategy) {
 		return new YsqlTemplate(applicationContext, mappingContext, converter, dataAccessStrategy);
 	}
 	
 	@Bean
-	public DataAccessStrategy dataAccessStrategyBean(NamedParameterJdbcOperations operations, JdbcConverter jdbcConverter,
+	public YsqlDataAccessStrategy ysqlDataAccessStrategyBean(NamedParameterJdbcOperations operations, JdbcConverter jdbcConverter,
 			JdbcMappingContext context, Dialect dialect) {
 		return new DefaultYsqlDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, dialect), context,
 				jdbcConverter, operations);
+	}
+	
+	@Bean
+	public JdbcMappingContext jdbcMappingContext(Optional<NamingStrategy> namingStrategy,
+			JdbcCustomConversions customConversions) {
+
+		JdbcMappingContext mappingContext = new JdbcMappingContext(namingStrategy.orElse(NamingStrategy.INSTANCE));
+		mappingContext.setSimpleTypeHolder(customConversions.getSimpleTypeHolder());
+
+		return mappingContext;
+	}
+	
+	@Bean
+	public JdbcConverter jdbcConverter(JdbcMappingContext mappingContext, NamedParameterJdbcOperations operations,
+			@Lazy RelationResolver relationResolver, JdbcCustomConversions conversions, Dialect dialect) {
+
+		DefaultJdbcTypeFactory jdbcTypeFactory = new DefaultJdbcTypeFactory(operations.getJdbcOperations());
+
+		return new BasicJdbcConverter(mappingContext, relationResolver, conversions, jdbcTypeFactory,
+			dialect.getIdentifierProcessing());
+	}
+
+	@Bean
+	public JdbcCustomConversions jdbcCustomConversions() {
+		return new JdbcCustomConversions();
+	}
+	
+	@Bean
+	public Dialect jdbcDialect(NamedParameterJdbcOperations operations) {
+		return DialectResolver.getDialect(operations.getJdbcOperations());
 	}
 
 }

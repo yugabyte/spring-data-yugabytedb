@@ -16,10 +16,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
-import org.springframework.data.jdbc.repository.support.SimpleJdbcRepository;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
@@ -48,7 +46,7 @@ public class YsqlRepositoryFactory extends RepositoryFactorySupport {
 	private final RelationalMappingContext context;
 	private final JdbcConverter converter;
 	private final ApplicationEventPublisher publisher;
-	private final DataAccessStrategy dataAccessStrategy;
+	private final YsqlDataAccessStrategy ysqlDataAccessStrategy;
 	private final NamedParameterJdbcOperations operations;
 	private final Dialect dialect;
 	@Nullable private BeanFactory beanFactory;
@@ -70,7 +68,7 @@ public class YsqlRepositoryFactory extends RepositoryFactorySupport {
 		this.context = context;
 		this.converter = converter;
 		this.dialect = dialect;
-		this.dataAccessStrategy = dataAccessStrategy;
+		this.ysqlDataAccessStrategy = dataAccessStrategy;
 		this.operations = operations;
 	}
 
@@ -94,7 +92,7 @@ public class YsqlRepositoryFactory extends RepositoryFactorySupport {
 	@Override
 	protected Object getTargetRepository(RepositoryInformation repositoryInformation) {
 
-		YsqlTemplate template = new YsqlTemplate(publisher, context, converter, (YsqlDataAccessStrategy)dataAccessStrategy);
+		YsqlTemplate template = new YsqlTemplate(publisher, context, converter, ysqlDataAccessStrategy);
 
 		if (entityCallbacks != null) {
 			template.setEntityCallbacks(entityCallbacks);
@@ -108,7 +106,7 @@ public class YsqlRepositoryFactory extends RepositoryFactorySupport {
 
 	@Override
 	protected Class<?> getRepositoryBaseClass(RepositoryMetadata repositoryMetadata) {
-		return SimpleJdbcRepository.class;
+		return SimpleYsqlRepository.class;
 	}
 
 	@Override

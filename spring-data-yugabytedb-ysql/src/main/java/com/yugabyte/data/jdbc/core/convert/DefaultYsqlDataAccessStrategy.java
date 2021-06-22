@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yugabyte, Inc.
+; * Copyright (c) Yugabyte, Inc.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except 
  * in compliance with the License.  You may obtain a copy of the License at
  * 
@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
 import com.yugabyte.data.jdbc.core.QueryOptions;
-import com.yugabyte.data.jdbc.core.TransactionMode;
+
 
 /**
  * The YugabyteDB
@@ -47,19 +47,23 @@ public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy
 	public long count(Class<?> domainType, QueryOptions queryOptions) {
 
 		String tableName = context.getRequiredPersistentEntity(domainType).getTableName()
-				.toSql(IdentifierProcessing.NONE);
+				.toSql(IdentifierProcessing.ANSI);
 		
 		String sqlString = String.format("SELECT COUNT(*) FROM %s", tableName);;
 		
-		if (queryOptions.getIsolationLevel().equalsIgnoreCase(TransactionMode.DEFRRABLE.toString())) {
-				// need to find a way to specify BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE
-				// scan_conn.setAutoCommit(false);
-
-            // Additionally, for long running scans, with concurrent writes, set READ ONLY, DEFERRABLE to
-            // avoid read-restarts.
-            // Statement stmt = scan_conn.createStatement();
-            // stmt.executeUpdate("BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE");
-		} 	
+//		if (queryOptions.getIsolationLevel().equalsIgnoreCase(TransactionMode.DEFRRABLE.toString())) {
+//				// need to find a way to specify BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE
+//				// scan_conn.setAutoCommit(false);
+//
+//            // Additionally, for long running scans, with concurrent writes, set READ ONLY, DEFERRABLE to
+//            // avoid read-restarts.
+//            // Statement stmt = scan_conn.createStatement();
+//            // stmt.executeUpdate("BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE");
+//			
+//			
+//			
+//			
+//		} 	
 		
 		Long result = operations.getJdbcOperations().queryForObject(sqlString, Long.class);
 
@@ -67,5 +71,5 @@ public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy
 
 		return result;
 	}
-
+	
 }
