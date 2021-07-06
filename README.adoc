@@ -60,30 +60,30 @@ public class CartService {
 @EnableYsqlRepositories
 public class YsqlConfig extends AbstractYugabyteJdbcConfiguration {
 
-	@Bean
-	DataSource dataSource() {
-		
-	  String hostName = "127.0.0.1";
-	  String port = "5433";
+    @Bean
+    DataSource dataSource() {
 
-	  Properties poolProperties = new Properties();
-	  poolProperties.setProperty("dataSourceClassName", "com.yugabyte.ysql.YBClusterAwareDataSource");
-	  poolProperties.setProperty("dataSource.serverName", hostName);
-	  poolProperties.setProperty("dataSource.portNumber", port);
-	  poolProperties.setProperty("dataSource.user", "yugabyte");
-	  poolProperties.setProperty("dataSource.password", "");
-	  poolProperties.setProperty("dataSource.loadBalance", "true");
-	  poolProperties.setProperty("dataSource.additionalEndpoints",
-	        "127.0.0.2:5433,127.0.0.3:5433");
+      String hostName = "127.0.0.1";
+      String port = "5433";
 
-	  HikariConfig hikariConfig = new HikariConfig(poolProperties);
-      	  DataSource ybClusterAwareDataSource = new HikariDataSource(hikariConfig);
-      	  return ybClusterAwareDataSource;
+      Properties poolProperties = new Properties();
+      poolProperties.setProperty("dataSourceClassName", "com.yugabyte.ysql.YBClusterAwareDataSource");
+      poolProperties.setProperty("dataSource.serverName", hostName);
+      poolProperties.setProperty("dataSource.portNumber", port);
+      poolProperties.setProperty("dataSource.user", "yugabyte");
+      poolProperties.setProperty("dataSource.password", "");
+      poolProperties.setProperty("dataSource.loadBalance", "true");
+      poolProperties.setProperty("dataSource.additionalEndpoints",
+	"127.0.0.2:5433,127.0.0.3:5433");
+
+      HikariConfig hikariConfig = new HikariConfig(poolProperties);
+      DataSource ybClusterAwareDataSource = new HikariDataSource(hikariConfig);
+      return ybClusterAwareDataSource;
     }
 
     @Bean
     TransactionManager transactionManager(DataSource dataSource) {                     
-        return new YugabyteTransactionManager(dataSource);
+      return new YugabyteTransactionManager(dataSource);
     }
 
 }
