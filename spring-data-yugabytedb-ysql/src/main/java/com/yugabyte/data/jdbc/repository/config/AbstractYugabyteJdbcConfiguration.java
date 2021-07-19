@@ -14,6 +14,8 @@ package com.yugabyte.data.jdbc.repository.config;
 
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,20 +44,20 @@ import com.yugabyte.data.jdbc.core.convert.YsqlDataAccessStrategy;
  */
 @Configuration(proxyBeanMethods = false)
 public class AbstractYugabyteJdbcConfiguration {
-	
+
 	@Bean
-	public YsqlTemplate ysqlTemplate(ApplicationContext applicationContext,
-			JdbcMappingContext mappingContext, JdbcConverter converter, YsqlDataAccessStrategy dataAccessStrategy) {
+	public YsqlTemplate ysqlTemplate(ApplicationContext applicationContext, JdbcMappingContext mappingContext,
+			JdbcConverter converter, YsqlDataAccessStrategy dataAccessStrategy) {
 		return new YsqlTemplate(applicationContext, mappingContext, converter, dataAccessStrategy);
 	}
-	
+
 	@Bean
-	public YsqlDataAccessStrategy ysqlDataAccessStrategyBean(NamedParameterJdbcOperations operations, JdbcConverter jdbcConverter,
-			JdbcMappingContext context, Dialect dialect) {
+	public YsqlDataAccessStrategy ysqlDataAccessStrategyBean(NamedParameterJdbcOperations operations,
+			JdbcConverter jdbcConverter, JdbcMappingContext context, Dialect dialect, DataSource dataSource) {
 		return new DefaultYsqlDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, dialect), context,
-				jdbcConverter, operations);
+				jdbcConverter, operations, dataSource);
 	}
-	
+
 	@Bean
 	public JdbcMappingContext jdbcMappingContext(Optional<NamingStrategy> namingStrategy,
 			JdbcCustomConversions customConversions) {
@@ -65,7 +67,7 @@ public class AbstractYugabyteJdbcConfiguration {
 
 		return mappingContext;
 	}
-	
+
 	@Bean
 	public JdbcConverter jdbcConverter(JdbcMappingContext mappingContext, NamedParameterJdbcOperations operations,
 			@Lazy RelationResolver relationResolver, JdbcCustomConversions conversions, Dialect dialect) {
@@ -73,14 +75,14 @@ public class AbstractYugabyteJdbcConfiguration {
 		DefaultJdbcTypeFactory jdbcTypeFactory = new DefaultJdbcTypeFactory(operations.getJdbcOperations());
 
 		return new BasicJdbcConverter(mappingContext, relationResolver, conversions, jdbcTypeFactory,
-			dialect.getIdentifierProcessing());
+				dialect.getIdentifierProcessing());
 	}
 
 	@Bean
 	public JdbcCustomConversions jdbcCustomConversions() {
 		return new JdbcCustomConversions();
 	}
-	
+
 	@Bean
 	public Dialect jdbcDialect(NamedParameterJdbcOperations operations) {
 		return DialectResolver.getDialect(operations.getJdbcOperations());

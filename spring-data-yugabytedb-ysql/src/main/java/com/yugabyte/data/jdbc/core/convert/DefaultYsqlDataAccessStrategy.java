@@ -1,5 +1,5 @@
 /*
-; * Copyright (c) Yugabyte, Inc.
+ * Copyright (c) Yugabyte, Inc.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except 
  * in compliance with the License.  You may obtain a copy of the License at
  * 
@@ -12,16 +12,24 @@
 */
 package com.yugabyte.data.jdbc.core.convert;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.sql.DataSource;
+
 import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 import com.yugabyte.data.jdbc.core.QueryOptions;
-
 
 /**
  * The YugabyteDB
@@ -30,46 +38,46 @@ import com.yugabyte.data.jdbc.core.QueryOptions;
  *
  * @author Nikhil Chandrappa
  */
-public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy
-		implements YsqlDataAccessStrategy {
+public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy implements YsqlDataAccessStrategy {
 
-	private final NamedParameterJdbcOperations operations;
+	private static final String DEFERRABLE_TRANSACTION = "BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE";
+	private final DataSource dataSource;
 	private final RelationalMappingContext context;
 
 	public DefaultYsqlDataAccessStrategy(SqlGeneratorSource sqlGeneratorSource, RelationalMappingContext context,
-			JdbcConverter converter, NamedParameterJdbcOperations operations) {
+			JdbcConverter converter, NamedParameterJdbcOperations operations, DataSource dataSource) {
 		super(sqlGeneratorSource, context, converter, operations);
-		this.operations = operations;
 		this.context = context;
+		this.dataSource = dataSource;
 	}
 
 	@Override
-	public long count(Class<?> domainType, QueryOptions queryOptions) {
+	public long count(Class<?> domainType, QueryOptions queryOptions) throws SQLException {
 
 		String tableName = context.getRequiredPersistentEntity(domainType).getTableName()
-				.toSql(IdentifierProcessing.ANSI);
-		
-		String sqlString = String.format("SELECT COUNT(*) FROM %s", tableName);;
-		
-//		if (queryOptions.getIsolationLevel().equalsIgnoreCase(TransactionMode.DEFRRABLE.toString())) {
-//				// need to find a way to specify BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE
-//				// scan_conn.setAutoCommit(false);
-//
-//            // Additionally, for long running scans, with concurrent writes, set READ ONLY, DEFERRABLE to
-//            // avoid read-restarts.
-//            // Statement stmt = scan_conn.createStatement();
-//            // stmt.executeUpdate("BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE");
-//			
-//			
-//			
-//			
-//		} 	
-		
-		Long result = operations.getJdbcOperations().queryForObject(sqlString, Long.class);
+				.toSql(IdentifierProcessing.ANSI);			
+		String sqlString = String.format("SELECT COUNT(*) FROM %s", tableName);
+
+		Connection readConnection = DataSourceUtils.getConnection(dataSource);
+		if (queryOptions.isDeferrable() != null && queryOptions.isDeferrable()) {
+			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+				readConnection.setAutoCommit(false);
+				Statement deferrableStatement = readConnection.createStatement();
+				deferrableStatement.executeUpdate(DEFERRABLE_TRANSACTION);
+			}
+		}
+
+		Statement countStatement = readConnection.createStatement();
+
+		ResultSet rs = countStatement.executeQuery(sqlString);
+		Long result = null;
+		while (rs.next()) {
+			result = rs.getLong(1);
+		}
+		readConnection.close();
 
 		Assert.notNull(result, "The result of a count query must not be null.");
-
 		return result;
 	}
-	
+
 }

@@ -25,7 +25,6 @@ public class YugabyteTransactionManager extends JdbcTransactionManager {
 	
 	public YugabyteTransactionManager() {
 		super();
-		setNestedTransactionAllowed(false);
 	}
 	
 	public YugabyteTransactionManager(DataSource dataSource) {
@@ -33,5 +32,10 @@ public class YugabyteTransactionManager extends JdbcTransactionManager {
 		setDataSource(dataSource);
 		afterPropertiesSet();
 	}
+	
+	@Override
+	protected boolean useSavepointForNestedTransaction() {
+		return false;
+	} 
 
 }

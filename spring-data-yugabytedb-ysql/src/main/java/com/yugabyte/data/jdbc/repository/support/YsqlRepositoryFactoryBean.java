@@ -14,6 +14,8 @@ package com.yugabyte.data.jdbc.repository.support;
 
 import java.io.Serializable;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,6 +52,7 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	private YsqlDataAccessStrategy ysqlDataAccessStrategy;
 	private QueryMappingConfiguration queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
 	private NamedParameterJdbcOperations operations;
+	private DataSource dataSource;
 	private EntityCallbacks entityCallbacks;
 	private Dialect dialect;
 
@@ -60,13 +63,13 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 	@Override
 	protected RepositoryFactorySupport doCreateRepositoryFactory() {
 		
-		YsqlRepositoryFactory yugabyteDbYsqlRepositoryFactory = new YsqlRepositoryFactory(ysqlDataAccessStrategy, mappingContext,
+		YsqlRepositoryFactory ysqlRepositoryFactory = new YsqlRepositoryFactory(ysqlDataAccessStrategy, mappingContext,
 				converter, dialect, publisher, operations);
-		yugabyteDbYsqlRepositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
-		yugabyteDbYsqlRepositoryFactory.setEntityCallbacks(entityCallbacks);
-		yugabyteDbYsqlRepositoryFactory.setBeanFactory(beanFactory);
+		ysqlRepositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
+		ysqlRepositoryFactory.setEntityCallbacks(entityCallbacks);
+		ysqlRepositoryFactory.setBeanFactory(beanFactory);
 
-		return yugabyteDbYsqlRepositoryFactory; 
+		return ysqlRepositoryFactory; 
 	}
 	
 	@Override
@@ -144,6 +147,13 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 
 			this.operations = beanFactory.getBean(NamedParameterJdbcOperations.class);
 		}
+		
+		if (this.dataSource == null) {
+
+			Assert.state(beanFactory != null, "If no DataSource are set a BeanFactory must be available.");
+
+			this.dataSource = beanFactory.getBean(DataSource.class);
+		}
 
 		if (this.ysqlDataAccessStrategy == null) {
 
@@ -157,7 +167,7 @@ public class YsqlRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extend
 						SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(this.mappingContext, this.converter,
 								this.dialect);
 						return new DefaultYsqlDataAccessStrategy(sqlGeneratorSource, this.mappingContext, this.converter,
-								this.operations);
+								this.operations, dataSource);
 					});
 		}
 

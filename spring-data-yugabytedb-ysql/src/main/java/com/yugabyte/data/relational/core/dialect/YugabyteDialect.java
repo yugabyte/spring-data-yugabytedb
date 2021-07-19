@@ -21,7 +21,7 @@ public class YugabyteDialect extends PostgresDialect {
 	
 	protected YugabyteDialect() {}
 	
-	private final YsqlLockClause LOCK_CLAUSE = new YsqlLockClause(this.getIdentifierProcessing());
+	private final LockClause LOCK_CLAUSE = new YugabyteLockClause(this.getIdentifierProcessing());
 	
 	/*
 	 * (non-Javadoc)
@@ -32,11 +32,11 @@ public class YugabyteDialect extends PostgresDialect {
 		return LOCK_CLAUSE;
 	}
 	
-	static class YsqlLockClause implements LockClause {
+	static class YugabyteLockClause implements LockClause {
 
 		private final IdentifierProcessing identifierProcessing;
 
-		YsqlLockClause(IdentifierProcessing identifierProcessing) {
+		YugabyteLockClause(IdentifierProcessing identifierProcessing) {
 			this.identifierProcessing = identifierProcessing;
 		}
 
@@ -44,6 +44,7 @@ public class YugabyteDialect extends PostgresDialect {
 		 * (non-Javadoc)
 		 * @see org.springframework.data.relational.core.dialect.LockClause#getLock(LockOptions)
 		 */
+		@SuppressWarnings("unused")
 		@Override
 		public String getLock(LockOptions lockOptions) {
 
@@ -66,15 +67,15 @@ public class YugabyteDialect extends PostgresDialect {
 			switch (lockOptions.getLockMode()) {
 
 				case PESSIMISTIC_WRITE:
-					return "FOR UPDATE OF " + tableName;
+					return "";
 
 				case PESSIMISTIC_READ:
-					return "FOR SHARE OF " + tableName;
+					return "";
 
 				default:
 					return "";
 			}
-		}
+		}	
 
 		/*
 		 * (non-Javadoc)
@@ -84,6 +85,7 @@ public class YugabyteDialect extends PostgresDialect {
 		public Position getClausePosition() {
 			return Position.AFTER_ORDER_BY;
 		}
+
 	};
 	
 
