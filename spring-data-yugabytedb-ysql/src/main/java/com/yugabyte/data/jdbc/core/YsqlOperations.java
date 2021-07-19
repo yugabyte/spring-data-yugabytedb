@@ -12,6 +12,8 @@
 */
 package com.yugabyte.data.jdbc.core;
 
+import java.sql.SQLException;
+
 import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 
 /**
@@ -31,32 +33,7 @@ public interface YsqlOperations extends JdbcAggregateOperations {
 	 * @param domainType the type of the aggregates to be counted.
 	 * @return the number of instances stored in the YugabyteDB cluster. Guaranteed to be not {@code null}.
 	 */
-	long count(Class<?> domainType, QueryOptions queryOptions);
-	
-//	/**
-//	 * Insert objects into database using batch semantics.  This skips the test 
-//	 * if the objects being inserted is new and makes an insert.
-//	 * <p>
-//	 * This is useful if the client provides an id for Objects being stored.
-//	 * </p>
-//	 * 
-//	 * @param instancees of objects being inserted into the database.
-//	 * @param <T> Type of the objects being inserted.
-//	 */
-//	 <T> void insertAll(Iterable<T> instances, QueryOptions queryOptions);
-	 
-	 
-//	/**
-//	 * Updates or Inserts object into database. 
-//	 * <p>
-//	 * This is used to support upsert functionality. 
-//	 * </p>
-//	 * 
-//	 * @param instancees of object being Updated or Inserted.
-//	 * @param specify action to be performed on conflict during upsert operation.
-//	 * @param <T> Type of the objects being updated or inserted.
-//	 */
-//	<T> T upsert(T instance, QueryOptions queryOptions);
+	long count(Class<?> domainType, QueryOptions queryOptions) throws SQLException;
 
 //	/**
 //	 * Load an aggregate from the database.

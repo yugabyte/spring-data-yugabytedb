@@ -12,6 +12,8 @@
 */
 package com.yugabyte.data.jdbc.core;
 
+import java.sql.SQLException;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
@@ -43,7 +45,7 @@ public class YsqlTemplate extends JdbcAggregateTemplate implements YsqlOperation
 		this.ysqlDataAccessStrategy = dataAccessStrategy;
 	}
 
-	public long count(Class<?> domainType, QueryOptions queryOptions) {
+	public long count(Class<?> domainType, QueryOptions queryOptions) throws SQLException {
 
 		Assert.notNull(domainType, "Domain type must not be null");
 		

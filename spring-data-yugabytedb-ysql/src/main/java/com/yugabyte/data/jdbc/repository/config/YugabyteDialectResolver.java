@@ -13,11 +13,12 @@
 package com.yugabyte.data.jdbc.repository.config;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Locale;
+import java.sql.Statement;
 import java.util.Optional;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.jdbc.repository.config.DialectResolver.DefaultDialectProvider;
@@ -39,6 +40,7 @@ public class YugabyteDialectResolver {
 	static public class YugabyteDialectProvider extends DefaultDialectProvider {
 
 		private static final Log LOG = LogFactory.getLog(YugabyteDialectProvider.class);
+		private static final String YUGABYTE_SERVERS_QUERY = "select * from yb_servers()";
 
 		@Override
 		public Optional<Dialect> getDialect(JdbcOperations operations) {
@@ -55,18 +57,25 @@ public class YugabyteDialectResolver {
 
 		@Nullable
 		private static Dialect getDialect(Connection connection) throws SQLException {
-
-			DatabaseMetaData metaData = connection.getMetaData();
 			
-			// make use of yb_tservers() to determine if its a yb-cluster.
-			String name = metaData.getDatabaseProductName().toLowerCase(Locale.ENGLISH);
-
-			if (name.contains("yugabyte")) {
-				return YugabyteDialect.INSTANCE;
+			Statement ybStatement = connection.createStatement();
+			Dialect dialect = null;
+			
+			LOG.debug("Executing query against YB_SERVERS() system function.");
+			ResultSet rs = ybStatement.executeQuery(YUGABYTE_SERVERS_QUERY);
+			if (!rs.next()) {
+				LOG.debug("Query for YB_SERVERS() system function returned null. Falling back on DefaultDialectProvider.");
+				return null;
+			}
+			
+			// Determine client application is connecting to a YugabyteDB cluster.
+			String hostName = rs.getString("host");
+			if (!StringUtils.isBlank(hostName)) {
+				dialect = YugabyteDialect.INSTANCE;
 			}
 
-			LOG.info(String.format("Couldn't determine Dialect for \"%s\"", name));
-			return null;
+			LOG.debug("Using YugabyteDB YSQL Dialect.");
+			return dialect;
 		}
 	}
 

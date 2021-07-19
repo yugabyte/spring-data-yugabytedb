@@ -54,6 +54,12 @@
 			<version>${postgresql.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+	      <groupId>com.yugabyte</groupId>
+	      <artifactId>jdbc-yugabytedb</artifactId>
+	      <version>${yugabyte.driver.version}</version>
+	    </dependency>
 
 	</dependencies>
 
