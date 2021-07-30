@@ -1,0 +1,122 @@
+= Spring Data YugabyteDB
+
+Spring Data YugabyteDB brings the power of Distributed SQL to Spring developers by using the familar Spring Data paradigms, Spring Data YugabyteDB supports Spring template and Spring repositories for accessing the data from YugabyteDB. Spring Data YuabyteDB is based on the [Spring Data JDBC](https://github.com/spring-projects/spring-data-jdbc) project which is extended to support YugabyteDB distributed SQL features.
+
+YugabyteDB is a high-performance, cloud-native distributed SQL database that aims to support all PostgreSQL features. It is best to fit for cloud-native OLTP (i.e. real-time, business-critical) applications that need absolute data correctness and require at least one of the following: scalability, high tolerance to failures, or globally-distributed deployments.
+
+== Features
+
+In addition to providing most PostgreSQL features supported by Spring Data JDBC, this project aims to enable the following:
+
+* CRUD operations for YugabyteDB
+* `@EnableYsqlRepositories` annotation to enable `YsqlRepository`
+* Yugabyte Distributed SQL transaction manager
+* Support for Follower Reads
+* Eliminate Load Balancer from SQL (cluster-awareness)
+* Develop Geo-Distributed Apps (topology-awareness)
+* Row Level Geo-partitioning support (partition-awareness)
+
+=== Getting Started
+
+A quick start example of getting started with Spring Data YugabyteDB in JAVA:
+
+[source, java]
+----
+public interface ShoppingCartRepository extends YsqlRepository<ShoppingCart, String> {
+
+  ShoppingCart findById(String id);
+
+  List<ShoppingCart> findByUserId(String userId);
+
+}
+
+@Service
+public class CartService {
+
+  private final ShoppingCartRepository repository;
+
+  public CartService(CartService repository) {
+    this.repository = repository;
+  }
+
+  public void doWork() {
+
+    repository.deleteAll();
+
+    ShoppingCart myShoppingCart = new ShoppingCart();
+    myShoppingCart.set("cart1")
+    myShoppingCart.setUserId("u1001");
+    myShoppingCart.setProductId("asin1001");
+    myShoppingCart.setQuantity(1);
+    
+    repository.save(myShoppingCart);
+
+    ShoppingCart savedCart = repository.findById("cart1");
+    List<ShoppingCart> productsInCart = repository.findByUserId("u1001");
+  }
+}
+
+@Configuration
+@EnableYsqlRepositories
+public class YsqlConfig extends AbstractYugabyteJdbcConfiguration {
+
+	@Bean
+	DataSource dataSource() {
+		
+	  String hostName = "127.0.0.1";
+	  String port = "5433";
+
+	  Properties poolProperties = new Properties();
+	  poolProperties.setProperty("dataSourceClassName", "com.yugabyte.ysql.YBClusterAwareDataSource");
+	  poolProperties.setProperty("dataSource.serverName", hostName);
+	  poolProperties.setProperty("dataSource.portNumber", port);
+	  poolProperties.setProperty("dataSource.user", "yugabyte");
+	  poolProperties.setProperty("dataSource.password", "");
+	  poolProperties.setProperty("dataSource.loadBalance", "true");
+	  poolProperties.setProperty("dataSource.additionalEndpoints",
+		    "127.0.0.2:5433,127.0.0.3:5433");
+
+	  HikariConfig hikariConfig = new HikariConfig(poolProperties);
+	  DataSource ybClusterAwareDataSource = new HikariDataSource(hikariConfig);
+	  return ybClusterAwareDataSource;
+	}
+
+  @Bean
+  JdbcTemplate jdbcTemplate(@Autowired DataSource dataSource) {
+
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    return jdbcTemplate;
+  }
+  
+  @Bean
+  NamedParameterJdbcOperations namedParameterJdbcOperations(DataSource dataSource) { 
+    return new NamedParameterJdbcTemplate(dataSource);
+  }
+
+	@Bean
+	TransactionManager transactionManager(DataSource dataSource) {                     
+	  return new YugabyteTransactionManager(dataSource);
+	}
+
+}
+----
+
+=== Maven configuration
+
+Add the Maven dependency:
+
+[source,xml]
+----
+<dependency>
+  <groupId>com.yugabyte</groupId>
+  <artifactId>spring-data-yugabytedb-ysql</artifactId>
+  <version>2.3.0</version>
+</dependency>
+<dependency>
+  <groupId>com.yugabyte</groupId>
+  <artifactId>jdbc-yugabytedb</artifactId>
+  <version>42.2.7-yb-5.beta.1</version>
+</dependency>
+----
+
+See also the https://github.com/yugabyte/spring-data-yugabytedb-example[spring-data-yugabytedb-example] app.

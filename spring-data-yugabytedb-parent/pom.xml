@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) YugaByte, Inc. Licensed under the Apache License, Version 
+	2.0 (the "License"); you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.data.build</groupId>
+		<artifactId>spring-data-parent</artifactId>
+		<version>2.5.3</version>
+		<relativePath/>
+	</parent>
+	<groupId>com.yugabyte</groupId>
+	<artifactId>spring-data-yugabytedb-parent</artifactId>
+	<version>2.3.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Spring Data Relational Parent</name>
+	<description>Parent module for Spring Data Relational repositories.
+	</description>
+	<url>https://projects.spring.io/spring-data-jdbc</url>
+
+
+	<developers>
+		<developer>
+			<id>nchandrappa</id>
+			<name>Nikhil Chandrappa</name>
+			<email>nikhil(at)yugabyte.com</email>
+			<organization>Yugabyte, Inc.</organization>
+			<organizationUrl>https://yugabyte.com</organizationUrl>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
+			<timezone>-5</timezone>
+		</developer>
+	</developers>
+
+	<properties>
+		<springdata.commons>2.5.3</springdata.commons>
+		<postgresql.version>42.2.19</postgresql.version>
+		<yugabyte.testcontainer.version>1.0.0-SNAPSHOT</yugabyte.testcontainer.version>
+		<mockito.version>3.8.0</mockito.version>
+		<awaitility.version>4.0.3</awaitility.version>
+		<yugabyte.driver.version>42.2.7-yb-5-beta.1</yugabyte.driver.version>
+	</properties>
+
+	<inceptionYear>2021</inceptionYear>
+
+<!-- 	<modules>
+		<module>spring-data-yugabytedb-ysql</module>
+	</modules> -->
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>${springdata.commons}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.yugabyte</groupId>
+			<artifactId>testcontainer</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+	</dependencies>
+
+</project>
