@@ -20,6 +20,16 @@ import com.yugabyte.data.jdbc.core.QueryOptions;
 
 public interface YsqlDataAccessStrategy extends DataAccessStrategy {
 	
+	
+	/**
+	 * Counts the number of objects of a given type.
+	 * 
+	 * Method uses below transaction isolation level for count(*) queries, 
+	 * Transaction BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE 
+	 * 
+	 * @param domainType the type of the aggregates to be counted.
+	 * @return the number of instances stored in the YugabyteDB cluster. Guaranteed to be not {@code null}.
+	 */
 	long count(Class<?> domainType, QueryOptions queryOptions) throws SQLException;
 	
 }

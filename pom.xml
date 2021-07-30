@@ -24,12 +24,8 @@
 		<developer>
 			<organization>Yugabyte, Inc.</organization>
 			<organizationUrl>https://yugabyte.com</organizationUrl>
-			<id>nchandrappa</id>
-			<name>Nikhil Chandrappa</name>
-			<email>nikhil(at)yugabyte.com</email>
-			<roles>
-				<role>Project Lead</role>
-			</roles>
+			<name>Yugabyte Development Team</name>
+			<email>info@yugabyte.com</email>
 			<timezone>-5</timezone>
 		</developer>
 	</developers>
@@ -42,5 +38,120 @@
 		<module>spring-boot-yugabytedb-autoconfigure</module>
 		<module>yugabytedb-ysql-spring-boot-starter</module>
 	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.8</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<parallel>methods</parallel>
+					<threadCount>10</threadCount>
+					<useFile>false</useFile>
+					<includes>
+						<include>**/*IntegrationTests.java</include>
+					</includes>
+					<systemPropertyVariables>
+						<spring.profiles.active>yugabyte</spring.profiles.active>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<configLocation>google_checks.xml</configLocation>
+					<encoding>UTF-8</encoding>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+					<linkXRef>false</linkXRef>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>Apache License Version 2.0</comments>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</connection>
+		<developerConnection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</developerConnection>
+		<url>https://github.com/yugabyte/spring-data-yugabytedb</url>
+		<tag>2.3.0</tag>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>${yugabyte.releases.repository.id}</id>
+			<url>${yugabyte.releases.repository.url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>${yugabyte.snapshots.repository.id}</id>
+			<url>${yugabyte.snapshots.repository.url}</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 </project>

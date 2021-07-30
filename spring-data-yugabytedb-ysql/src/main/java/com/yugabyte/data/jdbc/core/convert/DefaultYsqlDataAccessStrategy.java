@@ -58,7 +58,9 @@ public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy imp
 				.toSql(IdentifierProcessing.ANSI);			
 		String sqlString = String.format("SELECT COUNT(*) FROM %s", tableName);
 
+		// Determine transaction in flight before executing the DEFERRABLE transactions. 
 		Connection readConnection = DataSourceUtils.getConnection(dataSource);
+		Boolean originalAutoCommit = readConnection.getAutoCommit();
 		if (queryOptions.isDeferrable() != null && queryOptions.isDeferrable()) {
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
 				readConnection.setAutoCommit(false);
@@ -68,13 +70,17 @@ public class DefaultYsqlDataAccessStrategy extends DefaultDataAccessStrategy imp
 		}
 
 		Statement countStatement = readConnection.createStatement();
-
-		ResultSet rs = countStatement.executeQuery(sqlString);
 		Long result = null;
-		while (rs.next()) {
-			result = rs.getLong(1);
+
+		try {		
+			ResultSet rs = countStatement.executeQuery(sqlString);
+			while (rs.next()) {
+				result = rs.getLong(1);
+			}	
+		} finally {
+			readConnection.setAutoCommit(originalAutoCommit);
+			readConnection.close();
 		}
-		readConnection.close();
 
 		Assert.notNull(result, "The result of a count query must not be null.");
 		return result;
