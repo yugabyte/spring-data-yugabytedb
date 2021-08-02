@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.jdbc.repository.config.DialectResolver.DefaultDialectProvider;
@@ -26,6 +25,7 @@ import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 import com.yugabyte.data.relational.core.dialect.YugabyteDialect;
 
@@ -70,7 +70,7 @@ public class YugabyteDialectResolver {
 			
 			// Determine client application is connecting to a YugabyteDB cluster.
 			String hostName = rs.getString("host");
-			if (!StringUtils.isBlank(hostName)) {
+			if (StringUtils.hasText(hostName)) {
 				dialect = YugabyteDialect.INSTANCE;
 			}
 
