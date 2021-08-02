@@ -43,6 +43,8 @@
 
 	<properties>
 		<springdata.commons>2.5.3</springdata.commons>
+		<springdata.jdbc>2.2.3</springdata.jdbc>
+		<springdata.relational>2.2.3</springdata.relational>
 		<postgresql.version>42.2.19</postgresql.version>
 		<yugabyte.testcontainer.version>1.0.0-beta.1</yugabyte.testcontainer.version>
 		<mockito.version>3.8.0</mockito.version>

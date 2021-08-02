@@ -34,13 +34,13 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-relational</artifactId>
-			<version>${project.version}</version>
+			<version>${springdata.relational}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jdbc</artifactId>
-			<version>${project.version}</version>
+			<version>${springdata.jdbc}</version>
 		</dependency>
 
 		<dependency>

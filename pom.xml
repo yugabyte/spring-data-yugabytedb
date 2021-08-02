@@ -35,8 +35,8 @@
 	<modules>
 		<module>spring-data-yugabytedb-parent</module>
 		<module>spring-data-yugabytedb-ysql</module>
-		<module>spring-boot-yugabytedb-autoconfigure</module>
-		<module>yugabytedb-ysql-spring-boot-starter</module>
+<!-- 		<module>spring-boot-yugabytedb-autoconfigure</module>
+		<module>yugabytedb-ysql-spring-boot-starter</module> -->
 	</modules>
 
 	<build>
