@@ -61,4 +61,11 @@
 
 	</dependencies>
 
+	<scm>
+		<connection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</connection>
+		<developerConnection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</developerConnection>
+		<url>https://github.com/yugabyte/spring-data-yugabytedb</url>
+		<tag>2.3.0</tag>
+	</scm>
+
 </project>

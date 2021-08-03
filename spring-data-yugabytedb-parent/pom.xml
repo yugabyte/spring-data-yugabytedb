@@ -109,4 +109,23 @@
         </dependency>
 
 	</dependencies>
+
+	<scm>
+		<connection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</connection>
+		<developerConnection>scm:git:git@github.com:yugabyte/spring-data-yugabytedb.git</developerConnection>
+		<url>https://github.com/yugabyte/spring-data-yugabytedb</url>
+		<tag>2.3.0</tag>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>${yugabyte.releases.repository.id}</id>
+			<url>${yugabyte.releases.repository.url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>${yugabyte.snapshots.repository.id}</id>
+			<url>${yugabyte.snapshots.repository.url}</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
