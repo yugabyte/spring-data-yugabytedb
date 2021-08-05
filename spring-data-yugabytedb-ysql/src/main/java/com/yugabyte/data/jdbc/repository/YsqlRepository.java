@@ -14,6 +14,7 @@ package com.yugabyte.data.jdbc.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Extending {@link CrudRepository} to support additional methods specific to
@@ -22,7 +23,7 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @author Nikhil Chandrappa
  */
 @NoRepositoryBean
-public interface YsqlRepository<T, ID> extends CrudRepository<T, ID> {
+public interface YsqlRepository<T, ID> extends PagingAndSortingRepository<T, ID> {
 	
 	long count();
 
