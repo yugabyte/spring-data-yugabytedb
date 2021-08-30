@@ -17,9 +17,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.postgresql.util.PSQLException;
 import org.springframework.data.jdbc.repository.config.DialectResolver.DefaultDialectProvider;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.ConnectionCallback;
@@ -41,6 +43,7 @@ public class YugabyteDialectResolver {
 
 		private static final Log LOG = LogFactory.getLog(YugabyteDialectProvider.class);
 		private static final String YUGABYTE_SERVERS_QUERY = "select * from yb_servers()";
+		private static final String YB_SERVERS_FUNCTION_DOESNT_EXIST = "function yb_servers() does not exist";
 
 		@Override
 		public Optional<Dialect> getDialect(JdbcOperations operations) {
@@ -62,16 +65,30 @@ public class YugabyteDialectResolver {
 			Dialect dialect = null;
 			
 			LOG.debug("Executing query against YB_SERVERS() system function.");
-			ResultSet rs = ybStatement.executeQuery(YUGABYTE_SERVERS_QUERY);
-			if (!rs.next()) {
-				LOG.debug("Query for YB_SERVERS() system function returned null. Falling back on DefaultDialectProvider.");
-				return null;
-			}
-			
-			// Determine client application is connecting to a YugabyteDB cluster.
-			String hostName = rs.getString("host");
-			if (StringUtils.hasText(hostName)) {
-				dialect = YugabyteDialect.INSTANCE;
+			try {
+
+				ResultSet rs = ybStatement.executeQuery(YUGABYTE_SERVERS_QUERY);
+				if (!rs.next()) {
+					LOG.debug(
+							"Query for YB_SERVERS() system function returned null. Falling back on DefaultDialectProvider.");
+					return null;
+				}
+
+				// Determine client application is connecting to a YugabyteDB cluster.
+				String hostName = rs.getString("host");
+				if (StringUtils.hasText(hostName)) {
+					dialect = YugabyteDialect.INSTANCE;
+				}
+			} catch (PSQLException psqlException) {
+
+				Boolean functionNotExist = Pattern
+						.compile(Pattern.quote(YB_SERVERS_FUNCTION_DOESNT_EXIST), Pattern.CASE_INSENSITIVE)
+						.matcher(psqlException.getMessage()).find();
+
+				if (functionNotExist) {
+					LOG.debug("YB_SERVERS() system function doesn't exist. Falling back on DefaultDialectProvider.");
+					return null;
+				}
 			}
 
 			LOG.debug("Using YugabyteDB YSQL Dialect.");
