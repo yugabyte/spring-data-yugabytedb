@@ -87,6 +87,7 @@
 			<groupId>com.yugabyte</groupId>
 			<artifactId>testcontainer</artifactId>
 			<version>${yugabyte.testcontainer.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
